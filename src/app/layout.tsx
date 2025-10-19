@@ -3,8 +3,9 @@ import "./globals.css";
 import "./lib/envSetup";
 
 export const metadata: Metadata = {
-  title: "Realtime API Agents",
-  description: "A demo app from OpenAI.",
+  title: "Coach IA - Programme Quotidien",
+  description:
+    "Application immersive qui personnalise entraînement, nutrition et rituels bien-être grâce à l'intelligence artificielle.",
 };
 
 export default function RootLayout({
