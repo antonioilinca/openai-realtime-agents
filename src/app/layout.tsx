@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./lib/envSetup";
 
 export const metadata: Metadata = {
-  title: "Realtime API Agents",
-  description: "A demo app from OpenAI.",
+  title: "Fit Coach",
+  description: "Personalized fitness and nutrition planning dashboard.",
 };
 
 export default function RootLayout({
@@ -14,7 +13,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased`}>{children}</body>
+      <body className="antialiased bg-slate-950 text-slate-100">
+        {children}
+      </body>
     </html>
   );
 }

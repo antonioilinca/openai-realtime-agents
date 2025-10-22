@@ -1,16 +1,8 @@
-import React, { Suspense } from "react";
-import { TranscriptProvider } from "@/app/contexts/TranscriptContext";
-import { EventProvider } from "@/app/contexts/EventContext";
-import App from "./App";
+import React from "react";
+import { getDashboardData } from "./lib/data";
+import FitCoachDashboard from "./components/fit-coach-dashboard";
 
-export default function Page() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <TranscriptProvider>
-        <EventProvider>
-          <App />
-        </EventProvider>
-      </TranscriptProvider>
-    </Suspense>
-  );
+export default async function Page() {
+  const initialData = getDashboardData();
+  return <FitCoachDashboard initialData={initialData} />;
 }
