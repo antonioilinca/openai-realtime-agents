@@ -16,7 +16,8 @@
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  background: radial-gradient(circle at top, #111827 0%, #0f172a 35%, #020617 100%);
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  min-height: 100vh;
 }
