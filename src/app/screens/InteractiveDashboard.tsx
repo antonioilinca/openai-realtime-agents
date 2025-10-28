@@ -88,6 +88,8 @@ const initialState: ProjectInput = {
   language: "fr",
 };
 
+type SectionKey = Exclude<keyof ProjectInput, "language">;
+
 export default function InteractiveDashboard() {
   const restored = useMemo(() => restoreAutoSavedState<ProjectInput>(STORAGE_KEY), []);
   const [formData, setFormData] = useState<ProjectInput>(restored ?? initialState);
@@ -104,7 +106,7 @@ export default function InteractiveDashboard() {
     }
   }, [restored]);
 
-  const updateSection = <K extends keyof ProjectInput>(key: K, value: Partial<ProjectInput[K]>) => {
+  const updateSection = <K extends SectionKey>(key: K, value: Partial<ProjectInput[K]>) => {
     setFormData((prev) => ({
       ...prev,
       [key]: {

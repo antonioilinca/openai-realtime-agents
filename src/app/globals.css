@@ -62,7 +62,14 @@ body {
   }
 
   .input-field {
-    @apply w-full rounded-2xl border border-[color:var(--border-muted)] bg-white px-4 py-3 text-sm text-primary-900 shadow-[0_8px_30px_rgba(15,23,42,0.06)] outline-none transition focus:border-[color:var(--accent-primary)] focus:ring-2 focus:ring-[color:var(--accent-primary)] focus:ring-opacity-40 dark:bg-surface-muted dark:text-primary-100;
+    @apply w-full rounded-2xl border border-[color:var(--border-muted)] bg-white px-4 py-3 text-sm text-primary-900 shadow-[0_8px_30px_rgba(15,23,42,0.06)] outline-none transition focus:border-[color:var(--accent-primary)] focus:ring-2 focus:ring-[color:var(--accent-primary)] focus:ring-opacity-40;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .input-field {
+      background-color: var(--surface-muted);
+      color: rgba(241, 245, 249, 0.98);
+    }
   }
 
   .label {

@@ -1,6 +1,6 @@
 "use client";
 
-import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { PDFDocument, StandardFonts, rgb, type Color } from "pdf-lib";
 import JSZip from "jszip";
 
 import type { GeneratedPlan, ProjectInput } from "@/app/types";
@@ -29,7 +29,7 @@ export async function exportPlanAsPdf(plan: GeneratedPlan, input: ProjectInput) 
 
   const drawText = (
     text: string,
-    options: { size?: number; font?: any; color?: { r: number; g: number; b: number } } = {}
+    options: { size?: number; font?: any; color?: Color } = {}
   ) => {
     const size = options.size ?? 12;
     const font = options.font ?? helvetica;

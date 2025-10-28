@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, DM_Sans } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-dm-sans" });
 
 export const metadata: Metadata = {
   title: "Atlas Stratégique IA",
@@ -18,9 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className="bg-surface-primary">
-      <body
-        className={`${inter.variable} ${dmSans.variable} antialiased bg-surface-primary text-primary-900`}
-      >
+      <body className="antialiased bg-surface-primary text-primary-900">
         {children}
       </body>
     </html>
