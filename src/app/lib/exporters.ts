@@ -57,10 +57,16 @@ export async function exportPlanAsPdf(plan: GeneratedPlan, input: ProjectInput) 
     font: helveticaBold,
     color: rgb(0.04, 0.45, 0.88),
   });
-  drawText(`${input.overview.slogan} – ${new Date().toLocaleDateString("fr-FR")}`, {
+  drawText(`${input.overview.sector} · ${new Date().toLocaleDateString("fr-FR")}`, {
     size: 12,
     font: helvetica,
     color: rgb(0.2, 0.2, 0.2),
+  });
+  cursorY -= 6;
+  drawText(input.overview.elevatorPitch, {
+    size: 12,
+    font: helvetica,
+    color: rgb(0.15, 0.18, 0.24),
   });
   cursorY -= 12;
 
@@ -145,7 +151,7 @@ export async function exportPlanAsPdf(plan: GeneratedPlan, input: ProjectInput) 
 export async function exportPlanAsMarkdown(plan: GeneratedPlan, input: ProjectInput) {
   const markdown = `# ${input.overview.projectName}
 
-> ${input.overview.slogan}
+> ${input.overview.elevatorPitch}
 
 ## Résumé exécutif
 ${plan.executiveSummary}

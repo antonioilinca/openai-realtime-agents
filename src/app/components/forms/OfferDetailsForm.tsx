@@ -15,30 +15,21 @@ export default function OfferDetailsForm({ data, onChange }: OfferDetailsFormPro
   return (
     <div className="step-card space-y-6">
       <header className="flex flex-col gap-2">
-        <span className="badge">Offre & valeur</span>
-        <h2 className="section-title">Produits, pricing, preuves</h2>
+        <span className="badge">Offre signature</span>
+        <h2 className="section-title">Ce que vous livrez réellement</h2>
         <p className="text-sm text-primary-700">
-          Précisez ce que vous vendez, comment vous délivrez la valeur et ce qui rassure vos clients.
+          Décrivez l’offre phare, la promesse de valeur et comment vous prouvez l’impact.
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="md:col-span-2">
-          <label className="label">Offres / produits</label>
-          <textarea
-            className="input-field min-h-[110px]"
-            value={data.products}
-            onChange={(event) => updateField("products", event.target.value)}
-            placeholder="Détaillez vos produits, services, packs"
-          />
-        </div>
+      <div className="grid gap-4">
         <div>
-          <label className="label">Modèle tarifaire</label>
+          <label className="label">Offre / produit phare</label>
           <textarea
             className="input-field min-h-[90px]"
-            value={data.pricingModel}
-            onChange={(event) => updateField("pricingModel", event.target.value)}
-            placeholder="Abonnement, one-shot, freemium, commission…"
+            value={data.signatureOffer}
+            onChange={(event) => updateField("signatureOffer", event.target.value)}
+            placeholder="Format, contenu, expérience livrée, packages..."
           />
         </div>
         <div>
@@ -47,49 +38,25 @@ export default function OfferDetailsForm({ data, onChange }: OfferDetailsFormPro
             className="input-field min-h-[90px]"
             value={data.valueProposition}
             onChange={(event) => updateField("valueProposition", event.target.value)}
-            placeholder="Résumez votre promesse principale"
+            placeholder="Transformation apportée, bénéfice concret, émotion suscitée"
           />
         </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <label className="label">Modèle de revenus / tarification</label>
+          <input
+            className="input-field"
+            value={data.pricingModel}
+            onChange={(event) => updateField("pricingModel", event.target.value)}
+            placeholder="Abonnement, one-shot, licence, panier moyen visé..."
+          />
+        </div>
         <div>
           <label className="label">Preuves / traction</label>
           <textarea
-            className="input-field min-h-[90px]"
+            className="input-field min-h-[80px]"
             value={data.proofPoints}
             onChange={(event) => updateField("proofPoints", event.target.value)}
-            placeholder="Clients signés, témoignages, chiffres clés"
-          />
-        </div>
-        <div>
-          <label className="label">Livraison / expérience</label>
-          <textarea
-            className="input-field min-h-[90px]"
-            value={data.deliveryModel}
-            onChange={(event) => updateField("deliveryModel", event.target.value)}
-            placeholder="Processus de délivrance, formats, canaux"
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label className="label">Onboarding</label>
-          <textarea
-            className="input-field min-h-[90px]"
-            value={data.onboarding}
-            onChange={(event) => updateField("onboarding", event.target.value)}
-            placeholder="Étapes clés pour accueillir un client"
-          />
-        </div>
-        <div>
-          <label className="label">Fidélisation</label>
-          <textarea
-            className="input-field min-h-[90px]"
-            value={data.retentionStrategy}
-            onChange={(event) => updateField("retentionStrategy", event.target.value)}
-            placeholder="Programmes, services, automatisations"
+            placeholder="Résultats clients, chiffres, éléments différenciants tangibles"
           />
         </div>
       </div>

@@ -7,110 +7,80 @@ interface FinancialsFormProps {
   onChange: (value: Partial<FinancialInputs>) => void;
 }
 
-const formatNumber = (value: number) =>
-  Number.isFinite(value) ? value.toString() : "";
-
 export default function FinancialsForm({ data, onChange }: FinancialsFormProps) {
   const updateField = (field: keyof FinancialInputs, value: number) => {
-    onChange({ [field]: Number.isNaN(value) ? 0 : value } as Partial<FinancialInputs>);
+    onChange({ [field]: value } as Partial<FinancialInputs>);
   };
 
   return (
     <div className="step-card space-y-6">
       <header className="flex flex-col gap-2">
-        <span className="badge">Budget & chiffres</span>
-        <h2 className="section-title">Données financières clés</h2>
+        <span className="badge">Chiffres express</span>
+        <h2 className="section-title">Capacité d’investissement & objectifs</h2>
         <p className="text-sm text-primary-700">
-          Les montants permettent au moteur IA d’estimer la rentabilité et le seuil de rentabilité.
+          Quelques chiffres clés pour calibrer le budget, le ROI et la vitesse de croissance.
         </p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="label">Budget disponible (€)</label>
+          <label className="label">Budget disponible (EUR)</label>
           <input
             className="input-field"
             type="number"
-            value={formatNumber(data.availableBudget)}
+            value={data.availableBudget}
             onChange={(event) => updateField("availableBudget", Number(event.target.value))}
+            placeholder="Ex : 25000"
           />
         </div>
         <div>
-          <label className="label">Besoin de financement (€)</label>
+          <label className="label">Objectif CA mensuel (EUR)</label>
           <input
             className="input-field"
             type="number"
-            value={formatNumber(data.fundingNeeds)}
-            onChange={(event) => updateField("fundingNeeds", Number(event.target.value))}
+            value={data.monthlyRevenueTarget}
+            onChange={(event) => updateField("monthlyRevenueTarget", Number(event.target.value))}
+            placeholder="Ex : 15000"
           />
         </div>
         <div>
-          <label className="label">Runway (mois)</label>
+          <label className="label">Charges fixes mensuelles (EUR)</label>
           <input
             className="input-field"
             type="number"
-            value={formatNumber(data.runwayMonths)}
-            onChange={(event) => updateField("runwayMonths", Number(event.target.value))}
-          />
-        </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <div>
-          <label className="label">Charges fixes mensuelles (€)</label>
-          <input
-            className="input-field"
-            type="number"
-            value={formatNumber(data.monthlyFixedCosts)}
+            value={data.monthlyFixedCosts}
             onChange={(event) => updateField("monthlyFixedCosts", Number(event.target.value))}
+            placeholder="Ex : 8000"
           />
         </div>
         <div>
-          <label className="label">Coûts variables / COGS (€)</label>
+          <label className="label">CAC cible (EUR)</label>
           <input
             className="input-field"
             type="number"
-            value={formatNumber(data.cogs)}
-            onChange={(event) => updateField("cogs", Number(event.target.value))}
-          />
-        </div>
-        <div>
-          <label className="label">CAC cible (€)</label>
-          <input
-            className="input-field"
-            type="number"
-            value={formatNumber(data.expectedCAC)}
+            value={data.expectedCAC}
             onChange={(event) => updateField("expectedCAC", Number(event.target.value))}
+            placeholder="Coût d’acquisition souhaité"
           />
         </div>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-3">
         <div>
-          <label className="label">Panier moyen (€)</label>
+          <label className="label">Panier moyen (EUR)</label>
           <input
             className="input-field"
             type="number"
-            value={formatNumber(data.averageOrderValue)}
+            value={data.averageOrderValue}
             onChange={(event) => updateField("averageOrderValue", Number(event.target.value))}
+            placeholder="Valeur moyenne par vente"
           />
         </div>
         <div>
-          <label className="label">Taux de conversion (%)</label>
+          <label className="label">Runway restant (mois)</label>
           <input
             className="input-field"
             type="number"
-            value={formatNumber(data.expectedConversionRate)}
-            onChange={(event) => updateField("expectedConversionRate", Number(event.target.value))}
-          />
-        </div>
-        <div>
-          <label className="label">LTV moyenne (€)</label>
-          <input
-            className="input-field"
-            type="number"
-            value={formatNumber(data.lifetimeValue)}
-            onChange={(event) => updateField("lifetimeValue", Number(event.target.value))}
+            value={data.runwayMonths}
+            onChange={(event) => updateField("runwayMonths", Number(event.target.value))}
+            placeholder="Ex : 6"
           />
         </div>
       </div>

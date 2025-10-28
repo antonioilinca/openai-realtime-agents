@@ -18,11 +18,9 @@ import { usePlanGenerator } from "@/app/hooks/usePlanGenerator";
 import type { Objective, ProjectInput } from "@/app/types";
 
 const STEPS = [
-  { id: 1, label: "Projet", description: "Vision, objectifs, identité" },
-  { id: 2, label: "Marché", description: "Cibles, concurrence, signaux" },
-  { id: 3, label: "Offre", description: "Produits, prix, expérience" },
-  { id: 4, label: "Opérations", description: "Équipe, process, risques" },
-  { id: 5, label: "Finances", description: "Budget, conversions, runway" },
+  { id: 1, label: "Projet", description: "Vision, pitch et priorités" },
+  { id: 2, label: "Marché & Offre", description: "Clients, besoins, valeur" },
+  { id: 3, label: "Opérations & Chiffres", description: "Exécution et budget" },
 ];
 
 const STORAGE_KEY = "atlas-strategique-state";
@@ -36,53 +34,37 @@ const defaultObjectives: Objective[] = [
 const initialState: ProjectInput = {
   overview: {
     projectName: "",
-    slogan: "",
-    founderName: "",
-    email: "",
+    elevatorPitch: "",
     sector: "SaaS",
-    subSector: "",
     stage: "Prototype",
-    location: "France",
     vision: "",
-    mission: "",
     differentiator: "",
     objectives: defaultObjectives,
   },
   market: {
     targetCustomers: "",
-    pains: "",
+    coreNeed: "",
     keyTrends: "",
     competitors: "",
-    regulations: "",
-    geographies: "",
-    maturity: "En croissance",
   },
   offer: {
-    products: "",
-    pricingModel: "",
+    signatureOffer: "",
     valueProposition: "",
+    pricingModel: "",
     proofPoints: "",
-    deliveryModel: "",
-    onboarding: "",
-    retentionStrategy: "",
   },
   operations: {
     team: "",
     processes: "",
-    tools: "",
-    partnerships: "",
-    risks: "",
     automationWish: "",
+    risks: "",
   },
   financials: {
     availableBudget: 0,
-    fundingNeeds: 0,
+    monthlyRevenueTarget: 0,
     monthlyFixedCosts: 0,
-    cogs: 0,
     expectedCAC: 0,
     averageOrderValue: 0,
-    expectedConversionRate: 0,
-    lifetimeValue: 0,
     runwayMonths: 6,
   },
   language: "fr",
@@ -160,28 +142,28 @@ export default function InteractiveDashboard() {
               />
             )}
             {activeStep === 2 && (
-              <MarketInsightsForm
-                data={formData.market}
-                onChange={(value) => updateSection("market", value)}
-              />
+              <div className="space-y-6">
+                <MarketInsightsForm
+                  data={formData.market}
+                  onChange={(value) => updateSection("market", value)}
+                />
+                <OfferDetailsForm
+                  data={formData.offer}
+                  onChange={(value) => updateSection("offer", value)}
+                />
+              </div>
             )}
             {activeStep === 3 && (
-              <OfferDetailsForm
-                data={formData.offer}
-                onChange={(value) => updateSection("offer", value)}
-              />
-            )}
-            {activeStep === 4 && (
-              <OperationsSetupForm
-                data={formData.operations}
-                onChange={(value) => updateSection("operations", value)}
-              />
-            )}
-            {activeStep === 5 && (
-              <FinancialsForm
-                data={formData.financials}
-                onChange={(value) => updateSection("financials", value)}
-              />
+              <div className="space-y-6">
+                <OperationsSetupForm
+                  data={formData.operations}
+                  onChange={(value) => updateSection("operations", value)}
+                />
+                <FinancialsForm
+                  data={formData.financials}
+                  onChange={(value) => updateSection("financials", value)}
+                />
+              </div>
             )}
 
             <div className="flex flex-wrap justify-between gap-4">

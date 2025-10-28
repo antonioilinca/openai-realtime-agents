@@ -8,57 +8,41 @@ export interface Objective {
 
 export interface ProjectOverview {
   projectName: string;
-  slogan: string;
-  founderName: string;
-  email: string;
+  elevatorPitch: string;
   sector: string;
-  subSector: string;
   stage: StageLevel;
-  location: string;
   vision: string;
-  mission: string;
   differentiator: string;
   objectives: Objective[];
 }
 
 export interface MarketInsights {
   targetCustomers: string;
-  pains: string;
+  coreNeed: string;
   keyTrends: string;
   competitors: string;
-  regulations: string;
-  geographies: string;
-  maturity: "Émergent" | "En croissance" | "Mature";
 }
 
 export interface OfferDetails {
-  products: string;
-  pricingModel: string;
+  signatureOffer: string;
   valueProposition: string;
+  pricingModel: string;
   proofPoints: string;
-  deliveryModel: string;
-  onboarding: string;
-  retentionStrategy: string;
 }
 
 export interface OperationsSetup {
   team: string;
   processes: string;
-  tools: string;
-  partnerships: string;
-  risks: string;
   automationWish: string;
+  risks: string;
 }
 
 export interface FinancialInputs {
   availableBudget: number;
-  fundingNeeds: number;
+  monthlyRevenueTarget: number;
   monthlyFixedCosts: number;
-  cogs: number;
   expectedCAC: number;
   averageOrderValue: number;
-  expectedConversionRate: number;
-  lifetimeValue: number;
   runwayMonths: number;
 }
 

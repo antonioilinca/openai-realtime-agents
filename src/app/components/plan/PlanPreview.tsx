@@ -32,13 +32,14 @@ export default function PlanPreview({ data, onGenerate, isGenerating, disabled }
         </div>
 
         <div className="grid gap-3">
+          <PreviewCard title="Pitch" content={data.overview.elevatorPitch} />
           <PreviewCard title="Vision" content={data.overview.vision} />
           <PreviewCard title="Clients cibles" content={data.market.targetCustomers} />
-          <PreviewCard title="Offre" content={data.offer.valueProposition} />
+          <PreviewCard title="Offre phare" content={data.offer.signatureOffer} />
           <PreviewCard title="Process clés" content={data.operations.processes} />
           <PreviewCard
             title="Budget"
-            content={`Budget : ${data.financials.availableBudget.toLocaleString("fr-FR") } € · Charges fixes : ${data.financials.monthlyFixedCosts.toLocaleString("fr-FR")} €`}
+            content={`Budget : ${data.financials.availableBudget.toLocaleString("fr-FR")} € · Objectif CA : ${data.financials.monthlyRevenueTarget.toLocaleString("fr-FR")} €`}
           />
         </div>
 
@@ -78,14 +79,14 @@ function PreviewCard({ title, content }: { title: string; content: string }) {
 function computeReadinessScore(data: ProjectInput) {
   const fields = [
     data.overview.projectName,
-    data.overview.slogan,
+    data.overview.elevatorPitch,
     data.overview.vision,
     data.market.targetCustomers,
-    data.market.pains,
+    data.market.coreNeed,
     data.offer.valueProposition,
     data.operations.processes,
     data.financials.availableBudget,
-    data.financials.monthlyFixedCosts,
+    data.financials.monthlyRevenueTarget,
   ];
   const completed = fields.filter((value) => {
     if (typeof value === "number") {
@@ -101,9 +102,11 @@ function collectMissingFields(data: ProjectInput): string[] {
   if (!data.overview.projectName) missing.push("Nom du projet");
   if (!data.overview.vision) missing.push("Vision");
   if (!data.market.targetCustomers) missing.push("Clients cibles");
+  if (!data.market.coreNeed) missing.push("Problème client clé");
   if (!data.offer.valueProposition) missing.push("Proposition de valeur");
+  if (!data.offer.signatureOffer) missing.push("Offre phare");
   if (!data.operations.processes) missing.push("Processus clés");
   if (!data.financials.availableBudget) missing.push("Budget disponible");
-  if (!data.financials.monthlyFixedCosts) missing.push("Charges fixes");
+  if (!data.financials.monthlyRevenueTarget) missing.push("Objectif CA mensuel");
   return missing;
 }

@@ -24,51 +24,36 @@ function splitText(text: string, separator = /[\n\r]+/) {
 function fallbackBusinessModel(payload: PlanGenerationPayload): BusinessModelCanvas {
   const { overview, market, offer, operations, financials } = payload.input;
   return {
-    keyPartners: splitText(
-      `${operations.partnerships}\n${market.competitors}`
-    ).slice(0, 6),
-    keyActivities: splitText(
-      `${offer.deliveryModel}\n${operations.processes}`
-    ).slice(0, 6),
-    keyResources: splitText(
-      `${operations.team}\n${operations.tools}`
-    ).slice(0, 6),
+    keyPartners: splitText(`${operations.team}\n${market.competitors}`).slice(0, 6),
+    keyActivities: splitText(`${offer.signatureOffer}\n${operations.processes}`).slice(0, 6),
+    keyResources: splitText(`${overview.differentiator}\n${operations.automationWish}`).slice(0, 6),
     valuePropositions: splitText(offer.valueProposition).slice(0, 5),
-    customerRelationships: splitText(
-      `${offer.onboarding}\n${offer.retentionStrategy}`
-    ).slice(0, 5),
-    channels: splitText(market.targetCustomers).slice(0, 5),
+    customerRelationships: splitText(`${offer.proofPoints}\nExpérience client signature`).slice(0, 5),
+    channels: splitText(`${market.targetCustomers}\n${offer.pricingModel}`).slice(0, 5),
     customerSegments: splitText(market.targetCustomers).slice(0, 5),
     costStructure: [
       `Charges fixes mensuelles estimées à ${financials.monthlyFixedCosts.toLocaleString("fr-FR", { minimumFractionDigits: 0 })} €`,
-      `Coûts variables (COGS) évalués à ${financials.cogs.toLocaleString("fr-FR", { minimumFractionDigits: 0 })} €`,
-      `Investissements clés : ${operations.tools}`,
+      `Budget marketing aligné sur un CAC cible de ${financials.expectedCAC.toLocaleString("fr-FR", { minimumFractionDigits: 0 })} €`,
+      `Investissements innovation : ${operations.automationWish || "stack IA immersive"}`,
     ],
     revenueStreams: [
       offer.pricingModel,
-      `Ticket moyen visé : ${financials.averageOrderValue.toLocaleString("fr-FR", { minimumFractionDigits: 0 })} €`,
+      `Objectif de CA mensuel : ${financials.monthlyRevenueTarget.toLocaleString("fr-FR", { minimumFractionDigits: 0 })} €`,
+      `Panier moyen visé : ${financials.averageOrderValue.toLocaleString("fr-FR", { minimumFractionDigits: 0 })} €`,
     ],
-    commentary: `Modèle orienté ${overview.sector.toLowerCase()} avec priorités sur ${offer.valueProposition.toLowerCase()}.`,
+    commentary: `Modèle ${overview.sector.toLowerCase()} propulsé par ${offer.valueProposition.toLowerCase()} et une différenciation forte sur ${overview.differentiator.toLowerCase()}.`,
   };
 }
 
 function fallbackSwot(payload: PlanGenerationPayload): SwotAnalysis {
   const { overview, market, offer, operations } = payload.input;
   return {
-    strengths: splitText(
-      `${offer.valueProposition}\n${operations.team}\n${overview.differentiator}`
-    ).slice(0, 5),
-    weaknesses: splitText(
-      `${operations.risks}\nBudget disponible : ${payload.input.financials.availableBudget} €`
-    ).slice(0, 5),
-    opportunities: splitText(
-      `${market.keyTrends}\n${market.pains}`
-    ).slice(0, 5),
-    threats: splitText(
-      `${market.competitors}\n${market.regulations}`
-    ).slice(0, 5),
+    strengths: splitText(`${offer.valueProposition}\n${operations.team}\n${overview.differentiator}`).slice(0, 5),
+    weaknesses: splitText(`${operations.risks}\nOrganisation à industrialiser`).slice(0, 5),
+    opportunities: splitText(`${market.keyTrends}\n${market.coreNeed}`).slice(0, 5),
+    threats: splitText(`${market.competitors}\nRythme d’exécution insuffisant`).slice(0, 5),
     summary:
-      "Analyse SWOT générée sans IA avancée : prioriser la différenciation, surveiller la réglementation et sécuriser les ressources critiques.",
+      "Analyse SWOT générée sans IA avancée : amplifier vos forces différenciantes, capitaliser sur la tendance clé et sécuriser l’exécution face aux concurrents rapides.",
   };
 }
 
@@ -100,7 +85,9 @@ function fallbackCompetition(payload: PlanGenerationPayload): CompetitorInsight[
 function fallbackTimeline(payload: PlanGenerationPayload): TimelineMilestone[] {
   const { objectives } = payload.input.overview;
   const defaultActions = splitText(payload.input.operations.processes).slice(0, 6);
-  const missions = objectives.length ? objectives : [{ id: "0", label: payload.input.overview.mission, horizon: "60j" }];
+  const missions = objectives.length
+    ? objectives
+    : [{ id: "0", label: payload.input.overview.elevatorPitch, horizon: "60j" }];
 
   return [
     {
@@ -111,7 +98,9 @@ function fallbackTimeline(payload: PlanGenerationPayload): TimelineMilestone[] {
         `Cartographier les concurrents identifiés (${missions[0]?.label ?? "Objectif principal"})`,
         defaultActions[0] ?? "Documenter les process cœur",
       ],
-      owner: payload.input.overview.founderName || "Équipe fondatrice",
+      owner: payload.input.overview.projectName
+        ? `Équipe ${payload.input.overview.projectName}`
+        : "Équipe fondatrice",
       successMetrics: ["Brief stratégique validé", "KPI de base suivis"],
       automationIdeas: [payload.input.operations.automationWish || "Automatiser la collecte des prospects"],
     },
@@ -144,33 +133,36 @@ function fallbackTimeline(payload: PlanGenerationPayload): TimelineMilestone[] {
 
 function fallbackBudget(payload: PlanGenerationPayload): BudgetOverview {
   const { financials } = payload.input;
-  const revenueEstimate = financials.averageOrderValue * 100;
+  const expectedClients = financials.expectedCAC > 0
+    ? Math.round(Math.max(financials.availableBudget / financials.expectedCAC, 1))
+    : 50;
+  const revenueEstimate = financials.monthlyRevenueTarget || financials.averageOrderValue * expectedClients;
   return {
     fixedCosts: [
       { label: "Charges fixes mensuelles", amount: financials.monthlyFixedCosts },
       { label: "Équipe & freelances", amount: Math.round(financials.monthlyFixedCosts * 0.35) },
     ],
     variableCosts: [
-      { label: "Marketing & acquisition", amount: Math.round(financials.expectedCAC * 50) },
-      { label: "Coûts variables", amount: financials.cogs },
+      { label: "Marketing & acquisition", amount: Math.round(financials.expectedCAC * expectedClients) },
+      { label: "Expérience client premium", amount: Math.round(financials.averageOrderValue * 0.3 * expectedClients) },
     ],
     projectedRevenues: [
       { label: "Ventes prévues", amount: revenueEstimate },
-      { label: "Upsell / cross-sell", amount: Math.round(revenueEstimate * 0.15) },
+      { label: "Upsell / expansion", amount: Math.round(revenueEstimate * 0.2) },
     ],
-    breakEvenPoint: `Point mort estimé à ${Math.ceil(
-      (financials.monthlyFixedCosts + financials.cogs) /
-        Math.max(financials.averageOrderValue - financials.expectedCAC, 1)
-    )} clients par mois`,
-    runwayComment: `Runway estimé : ${financials.runwayMonths} mois.`,
-    roiProjection: `ROI potentiel sur 90j si ${financials.expectedConversionRate}% de conversion et panier moyen de ${financials.averageOrderValue} €`,
+    breakEvenPoint: `Point mort estimé à ${Math.max(
+      Math.ceil((financials.monthlyFixedCosts || 1) / Math.max(financials.averageOrderValue - financials.expectedCAC, 1)),
+      1,
+    )} clients mensuels`,
+    runwayComment: `Runway estimé : ${financials.runwayMonths} mois avec le budget actuel.`,
+    roiProjection: `Objectif : atteindre ${financials.monthlyRevenueTarget.toLocaleString("fr-FR")} € de CA mensuel et rentabiliser chaque euro investi en ${financials.expectedCAC.toLocaleString("fr-FR")} € de CAC.`,
     alerts: [
       financials.availableBudget < financials.monthlyFixedCosts
         ? "Budget insuffisant pour couvrir un mois de charges fixes"
         : "Budget cohérent avec le plan de marche",
-      financials.fundingNeeds > 0
-        ? `Prévoir une levée de ${financials.fundingNeeds} €`
-        : "Pas de levée immédiate nécessaire",
+      financials.runwayMonths < 4
+        ? "Sécuriser un coussin de trésorerie supplémentaire"
+        : "Runway confortable pour dérouler le plan",
     ],
   };
 }
@@ -208,10 +200,14 @@ function fallbackMarketing(payload: PlanGenerationPayload): MarketingPlan {
   ];
 
   return {
-    northStarMetric: "Croissance du revenu mensuel récurrent" + (sector.includes("commerce") ? " et panier moyen" : ""),
-    acquisitionStrategy: "Combiner contenu expert, prospection ciblée et partenariats pour générer un flux régulier de leads qualifiés.",
-    conversionStrategy: "Miser sur la preuve sociale, des démonstrations live et une offre d’essai pour rassurer et convertir.",
-    retentionStrategy: "Mettre en place un onboarding premium, mesurer le feedback en continu et proposer des upsells pertinents.",
+    northStarMetric:
+      (sector.includes("commerce") ? "Croissance du panier moyen et" : "") + " revenu mensuel récurrent",
+    acquisitionStrategy:
+      "Combiner contenu expert, campagnes ciblées et partenariats influenceurs pour générer un flux continu de prospects qualifiés.",
+    conversionStrategy:
+      "Mettre en scène des preuves sociales percutantes, des démos personnalisées et une offre irrésistible pour convertir vite.",
+    retentionStrategy:
+      "Déployer un onboarding premium, mesurer le feedback en continu et proposer des offres d’expansion à forte valeur.",
     automationPrinciples: [
       "Synchroniser CRM et outils de support pour une vision 360°",
       "Automatiser les alertes KPI critiques",
@@ -224,28 +220,29 @@ function fallbackMarketing(payload: PlanGenerationPayload): MarketingPlan {
 function fallbackAiRecommendation(payload: PlanGenerationPayload): AiRecommendation {
   return {
     quickWins: [
-      "Valider le message de valeur via 5 entretiens clients",
-      "Mettre en place un tableau de bord Notion pour piloter les KPI clés",
+      "Valider le message de valeur via 5 entretiens clients de votre segment idéal",
+      "Mettre en place un cockpit Notion/Sheets pour piloter les KPI clés en temps réel",
     ],
     strategicLevers: [
-      "Structurer un programme ambassadeurs pour accélérer le bouche-à-oreille",
-      "Sécuriser 2 partenariats distribution complémentaires",
+      "Structurer un programme ambassadeurs pour amplifier le bouche-à-oreille",
+      "Sécuriser 2 partenariats distribution ou influenceurs complémentaires",
     ],
     watchpoints: [
-      "Suivre l’évolution réglementaire évoquée",
+      "Suivre le tempo d’exécution vs. ambitions commerciales",
       payload.input.operations.risks || "Veiller à la qualité de l’expérience client",
     ],
-    prediction90d: "En respectant ce plan, une traction commerciale significative peut émerger d’ici 3 mois avec un premier ROI mesurable.",
+    prediction90d:
+      "En déroulant ce plan, vous pouvez générer une traction puissante en 90 jours avec des revenus récurrents en forte hausse et une marque remarquée sur votre marché.",
     confidence: defaultConfidence,
   };
 }
 
 export function fallbackPlan(payload: PlanGenerationPayload): PlanResponse {
   const plan: GeneratedPlan = {
-    executiveSummary: `Plan généré avec le moteur interne pour ${payload.input.overview.projectName}. Priorités : ${payload.input.overview.objectives
+    executiveSummary: `Plan haute intensité généré pour ${payload.input.overview.projectName || "votre projet"}. Nous concentrons l’effort sur ${payload.input.overview.objectives
       .map((o) => o.label)
       .slice(0, 3)
-      .join(", ")}.`,
+      .join(", ") || "vos jalons clés"}, avec un focus ${payload.input.overview.sector.toLowerCase()} et un ton résolument ambitieux.`,
     businessModel: fallbackBusinessModel(payload),
     swot: fallbackSwot(payload),
     competition: fallbackCompetition(payload),
@@ -258,7 +255,7 @@ export function fallbackPlan(payload: PlanGenerationPayload): PlanResponse {
   return {
     plan,
     aiNotes:
-      "Le plan a été généré sans appel à une API externe. Ajustez les données de marché dès que possible pour plus de précision.",
+      "Plan généré via le moteur interne Atlas. Ajoutez des détails marché ou traction pour encore plus de finesse puis itérez avec l’IA copilote.",
     version: payload.mode === "iterate" ? 2 : 1,
   };
 }
@@ -362,6 +359,8 @@ INSTRUCTIONS:
 - Fournir des montants numériques sans symbole € dans le JSON.
 - Mettre en avant les automatisations pertinentes.
 - Si itération, intégrer les ajustements demandés.
+- Délivrer un plan spectaculaire et immédiatement actionnable sans poser de questions supplémentaires.
+- Prioriser les actions à fort levier et préciser les livrables clés.
 `;
 }
 
