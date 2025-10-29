@@ -1,148 +1,168 @@
-import { z } from "zod";
+export type StageLevel = "Idée" | "Prototype" | "Lancement" | "Croissance" | "Relance";
 
-// Define the allowed moderation categories only once
-export const MODERATION_CATEGORIES = [
-  "OFFENSIVE",
-  "OFF_BRAND",
-  "VIOLENCE",
-  "NONE",
-] as const;
-
-// Derive the union type for ModerationCategory from the array
-export type ModerationCategory = (typeof MODERATION_CATEGORIES)[number];
-
-// Create a Zod enum based on the same array
-export const ModerationCategoryZod = z.enum([...MODERATION_CATEGORIES]);
-
-export type SessionStatus = "DISCONNECTED" | "CONNECTING" | "CONNECTED";
-
-export interface ToolParameterProperty {
-  type: string;
-  description?: string;
-  enum?: string[];
-  pattern?: string;
-  properties?: Record<string, ToolParameterProperty>;
-  required?: string[];
-  additionalProperties?: boolean;
-  items?: ToolParameterProperty;
+export interface Objective {
+  id: string;
+  label: string;
+  horizon: "30j" | "60j" | "90j" | "Long terme";
 }
 
-export interface ToolParameters {
-  type: string;
-  properties: Record<string, ToolParameterProperty>;
-  required?: string[];
-  additionalProperties?: boolean;
+export interface ProjectOverview {
+  projectName: string;
+  elevatorPitch: string;
+  sector: string;
+  stage: StageLevel;
+  vision: string;
+  differentiator: string;
+  objectives: Objective[];
 }
 
-export interface Tool {
-  type: "function";
+export interface MarketInsights {
+  targetCustomers: string;
+  coreNeed: string;
+  keyTrends: string;
+  competitors: string;
+}
+
+export interface OfferDetails {
+  signatureOffer: string;
+  valueProposition: string;
+  pricingModel: string;
+  proofPoints: string;
+}
+
+export interface OperationsSetup {
+  team: string;
+  processes: string;
+  automationWish: string;
+  risks: string;
+}
+
+export interface FinancialInputs {
+  availableBudget: number;
+  monthlyRevenueTarget: number;
+  monthlyFixedCosts: number;
+  expectedCAC: number;
+  averageOrderValue: number;
+  runwayMonths: number;
+}
+
+export interface ProjectInput {
+  overview: ProjectOverview;
+  market: MarketInsights;
+  offer: OfferDetails;
+  operations: OperationsSetup;
+  financials: FinancialInputs;
+  language: "fr" | "en";
+}
+
+export interface BusinessModelCanvas {
+  keyPartners: string[];
+  keyActivities: string[];
+  keyResources: string[];
+  valuePropositions: string[];
+  customerRelationships: string[];
+  channels: string[];
+  customerSegments: string[];
+  costStructure: string[];
+  revenueStreams: string[];
+  commentary: string;
+}
+
+export interface SwotAnalysis {
+  strengths: string[];
+  weaknesses: string[];
+  opportunities: string[];
+  threats: string[];
+  summary: string;
+}
+
+export interface CompetitorInsight {
   name: string;
-  description: string;
-  parameters: ToolParameters;
+  positioning: string;
+  pricing: string;
+  value: string;
+  differentiation: string;
 }
 
-export interface AgentConfig {
-  name: string;
-  publicDescription: string; // gives context to agent transfer tool
-  instructions: string;
-  tools: Tool[];
-  toolLogic?: Record<
-    string,
-    (args: any, transcriptLogsFiltered: TranscriptItem[], addTranscriptBreadcrumb?: (title: string, data?: any) => void) => Promise<any> | any
-  >;
-  // addTranscriptBreadcrumb is a param in case we want to add additional breadcrumbs, e.g. for nested tool calls from a supervisor agent.
-  downstreamAgents?:
-    | AgentConfig[]
-    | { name: string; publicDescription: string }[];
+export interface TimelineMilestone {
+  phase: "30j" | "60j" | "90j";
+  focus: string;
+  keyActions: string[];
+  owner: string;
+  successMetrics: string[];
+  automationIdeas: string[];
 }
 
-export type AllAgentConfigsType = Record<string, AgentConfig[]>;
-
-export interface GuardrailResultType {
-  status: "IN_PROGRESS" | "DONE";
-  testText?: string; 
-  category?: ModerationCategory;
-  rationale?: string;
+export interface BudgetOverview {
+  fixedCosts: { label: string; amount: number }[];
+  variableCosts: { label: string; amount: number }[];
+  projectedRevenues: { label: string; amount: number }[];
+  breakEvenPoint: string;
+  runwayComment: string;
+  roiProjection: string;
+  alerts: string[];
 }
 
-export interface TranscriptItem {
-  itemId: string;
-  type: "MESSAGE" | "BREADCRUMB";
-  role?: "user" | "assistant";
-  title?: string;
-  data?: Record<string, any>;
-  expanded: boolean;
-  timestamp: string;
-  createdAtMs: number;
-  status: "IN_PROGRESS" | "DONE";
-  isHidden: boolean;
-  guardrailResult?: GuardrailResultType;
+export interface MarketingPlay {
+  audience: string;
+  promise: string;
+  channel: string;
+  funnelStage: "Awareness" | "Consideration" | "Conversion" | "Fidélisation";
+  contentIdeas: string[];
+  kpis: string[];
+  automationStack: string[];
 }
 
-export interface Log {
-  id: number;
-  timestamp: string;
-  direction: string;
-  eventName: string;
-  data: any;
-  expanded: boolean;
-  type: string;
+export interface MarketingPlan {
+  northStarMetric: string;
+  acquisitionStrategy: string;
+  conversionStrategy: string;
+  retentionStrategy: string;
+  automationPrinciples: string[];
+  plays: MarketingPlay[];
 }
 
-export interface ServerEvent {
-  type: string;
-  event_id?: string;
-  item_id?: string;
-  transcript?: string;
-  delta?: string;
-  session?: {
-    id?: string;
-  };
-  item?: {
-    id?: string;
-    object?: string;
-    type?: string;
-    status?: string;
-    name?: string;
-    arguments?: string;
-    role?: "user" | "assistant";
-    content?: {
-      type?: string;
-      transcript?: string | null;
-      text?: string;
-    }[];
-  };
-  response?: {
-    output?: {
-      id: string;
-      type?: string;
-      name?: string;
-      arguments?: any;
-      call_id?: string;
-      role: string;
-      content?: any;
-    }[];
-    metadata: Record<string, any>;
-    status_details?: {
-      error?: any;
-    };
-  };
+export interface AiRecommendation {
+  quickWins: string[];
+  strategicLevers: string[];
+  watchpoints: string[];
+  prediction90d: string;
+  confidence: "Faible" | "Modérée" | "Élevée";
 }
 
-export interface LoggedEvent {
-  id: number;
-  direction: "client" | "server";
-  expanded: boolean;
-  timestamp: string;
-  eventName: string;
-  eventData: Record<string, any>; // can have arbitrary objects logged
+export interface GeneratedPlan {
+  executiveSummary: string;
+  businessModel: BusinessModelCanvas;
+  swot: SwotAnalysis;
+  competition: CompetitorInsight[];
+  timeline: TimelineMilestone[];
+  budget: BudgetOverview;
+  marketing: MarketingPlan;
+  aiRecommendation: AiRecommendation;
 }
 
-// Update the GuardrailOutputZod schema to use the shared ModerationCategoryZod
-export const GuardrailOutputZod = z.object({
-  moderationRationale: z.string(),
-  moderationCategory: ModerationCategoryZod,
-  testText: z.string().optional(),
-});
+export interface PlanResponse {
+  plan: GeneratedPlan;
+  aiNotes: string;
+  version: number;
+}
 
-export type GuardrailOutput = z.infer<typeof GuardrailOutputZod>;
+export interface IterationMessage {
+  id: string;
+  role: "utilisateur" | "assistant";
+  content: string;
+  createdAt: string;
+}
+
+export interface IterationResponse {
+  notes: string;
+  plan?: GeneratedPlan;
+}
+
+export interface PlanGenerationPayload {
+  input: ProjectInput;
+  previousPlan?: GeneratedPlan;
+  conversation?: IterationMessage[];
+  mode: "generate" | "iterate";
+  userMessage?: string;
+}
