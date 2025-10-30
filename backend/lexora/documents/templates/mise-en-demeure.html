@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mise en demeure - LEXORA</title>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background: #f5f7fb;
+        color: #111318;
+        padding: 2rem;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #0A73E1;
+      }
+      .section {
+        margin-bottom: 1.8rem;
+        padding: 1.5rem;
+        border-radius: 1.2rem;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+      .meta {
+        color: #9AA4B2;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>LEXORA — Mise en demeure</h1>
+      <p class="meta">
+        Document généré le {{ generation_date }} · Domaine : {{ domain | upper }}
+      </p>
+    </header>
+    <div class="section">
+      <p>{{ claimant_name }}<br />{{ claimant_address }}</p>
+      <p>{{ recipient_name }}<br />{{ recipient_address }}</p>
+    </div>
+    <div class="section">
+      <p>Objet : Mise en demeure relative à {{ subject }}</p>
+      <p>
+        Madame, Monsieur,<br />
+        Nous vous mettons en demeure de {{ demand }} dans un délai de {{ delay }} jours à
+        compter de la réception de ce courrier, conformément à l'article {{ legal_basis }}.
+      </p>
+      <p>
+        À défaut d'exécution, nous nous réservons le droit d'engager toute procédure utile
+        auprès de l'autorité compétente.
+      </p>
+    </div>
+    <div class="section">
+      <h2>Pièces jointes</h2>
+      <ul>
+        {% for doc in attachments %}
+        <li>{{ doc }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <footer class="meta">
+      Information juridique générale. Pour un conseil personnalisé ou une représentation,
+      contactez un avocat.
+    </footer>
+  </body>
+</html>
