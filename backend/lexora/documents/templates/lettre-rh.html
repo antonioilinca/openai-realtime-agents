@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Courrier RH - LEXORA</title>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 2rem;
+        background-color: #0B0D10;
+        color: #f1f5f9;
+      }
+      .card {
+        background: #111318;
+        border-radius: 1.2rem;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        line-height: 1.6;
+      }
+      h1 {
+        color: #0A73E1;
+      }
+      ul {
+        padding-left: 1.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Courrier au service RH</h1>
+      <p>{{ employee_name }}<br />{{ employee_position }}</p>
+      <p>Service RH<br />{{ employer_name }}</p>
+      <p>Objet : Régularisation des heures supplémentaires</p>
+      <p>
+        Madame, Monsieur,<br />
+        Je vous informe que sur la période du {{ period }}, j'ai effectué {{ overtime_hours }} heures supplémentaires non
+        rémunérées. Conformément à {{ legal_basis }}, je vous demande la régularisation de ces heures, incluant les majorations
+        applicables.
+      </p>
+      <p>Je reste disponible pour échanger et vous remercie de votre diligence.</p>
+      <h2>Pièces jointes</h2>
+      <ul>
+        {% for doc in attachments %}
+        <li>{{ doc }}</li>
+        {% endfor %}
+      </ul>
+      <p>Cordialement,<br />{{ employee_name }}</p>
+    </div>
+  </body>
+</html>

@@ -1,148 +1,123 @@
-import { z } from "zod";
+export type Domain = "conso" | "logement" | "travail";
 
-// Define the allowed moderation categories only once
-export const MODERATION_CATEGORIES = [
-  "OFFENSIVE",
-  "OFF_BRAND",
-  "VIOLENCE",
-  "NONE",
-] as const;
+export type AccountType = "individual" | "company";
 
-// Derive the union type for ModerationCategory from the array
-export type ModerationCategory = (typeof MODERATION_CATEGORIES)[number];
-
-// Create a Zod enum based on the same array
-export const ModerationCategoryZod = z.enum([...MODERATION_CATEGORIES]);
-
-export type SessionStatus = "DISCONNECTED" | "CONNECTING" | "CONNECTED";
-
-export interface ToolParameterProperty {
-  type: string;
-  description?: string;
-  enum?: string[];
-  pattern?: string;
-  properties?: Record<string, ToolParameterProperty>;
-  required?: string[];
-  additionalProperties?: boolean;
-  items?: ToolParameterProperty;
+export interface AnalyzeRequest {
+  situation: string;
+  domain: Domain;
 }
 
-export interface ToolParameters {
-  type: string;
-  properties: Record<string, ToolParameterProperty>;
-  required?: string[];
-  additionalProperties?: boolean;
+export interface ClassificationEntities {
+  dates: string[];
+  amounts: number[];
+  parties: string[];
 }
 
-export interface Tool {
-  type: "function";
-  name: string;
+export interface ClassificationResult {
+  branch: string;
+  sub_branch: string;
+  entities: ClassificationEntities;
+  clarifying_questions: string[];
+}
+
+export interface Citation {
+  eli: string;
+  nor?: string | null;
+  url: string;
+  version?: string | null;
+  hash?: string | null;
+  summary?: string | null;
+}
+
+export interface AnalysisResponse {
+  analysis_id: string;
+  classification: ClassificationResult;
+  citations: Citation[];
+  summary: string;
+  confidence: number;
+}
+
+export interface PlanRequest {
+  analysisId: string;
+  goals: string[];
+}
+
+export interface PlanStep {
+  step: string;
+  legal_basis: string[];
+  deadline?: string | null;
+  authority?: string | null;
+  cost?: string | null;
+  required_docs: string[];
+}
+
+export interface PlanResponse {
+  plan_id: string;
+  steps: PlanStep[];
+  deadlines: string[];
+  costs: string[];
+  authorities: string[];
+  kpis: Record<string, unknown>;
+  audience_focus?: string | null;
+}
+
+export interface DocumentRequest {
+  planId: string;
+  templateId: string;
+  vars: Record<string, unknown>;
+}
+
+export interface DocumentResponse {
+  pdfUrl: string;
+}
+
+export interface SourceLogItem {
+  eli: string;
+  url: string;
+  version: string;
+  hash: string;
+  extracted_at: string;
+}
+
+export interface SourceLogResponse {
+  items: SourceLogItem[];
+}
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+  accountType: AccountType;
+  fullName: string;
+  companyName?: string | null;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UserProfile {
+  userId: string;
+  email: string;
+  accountType: AccountType;
+  displayName: string;
+  companyName?: string | null;
+}
+
+export interface AuthResponse {
+  token: string;
+  profile: UserProfile;
+}
+
+export interface ProcedurePreview {
+  step: string;
+  deadline?: string;
+  authority?: string;
+  cost?: string;
+}
+
+export interface TemplatePreview {
+  id: string;
+  label: string;
   description: string;
-  parameters: ToolParameters;
 }
-
-export interface AgentConfig {
-  name: string;
-  publicDescription: string; // gives context to agent transfer tool
-  instructions: string;
-  tools: Tool[];
-  toolLogic?: Record<
-    string,
-    (args: any, transcriptLogsFiltered: TranscriptItem[], addTranscriptBreadcrumb?: (title: string, data?: any) => void) => Promise<any> | any
-  >;
-  // addTranscriptBreadcrumb is a param in case we want to add additional breadcrumbs, e.g. for nested tool calls from a supervisor agent.
-  downstreamAgents?:
-    | AgentConfig[]
-    | { name: string; publicDescription: string }[];
-}
-
-export type AllAgentConfigsType = Record<string, AgentConfig[]>;
-
-export interface GuardrailResultType {
-  status: "IN_PROGRESS" | "DONE";
-  testText?: string; 
-  category?: ModerationCategory;
-  rationale?: string;
-}
-
-export interface TranscriptItem {
-  itemId: string;
-  type: "MESSAGE" | "BREADCRUMB";
-  role?: "user" | "assistant";
-  title?: string;
-  data?: Record<string, any>;
-  expanded: boolean;
-  timestamp: string;
-  createdAtMs: number;
-  status: "IN_PROGRESS" | "DONE";
-  isHidden: boolean;
-  guardrailResult?: GuardrailResultType;
-}
-
-export interface Log {
-  id: number;
-  timestamp: string;
-  direction: string;
-  eventName: string;
-  data: any;
-  expanded: boolean;
-  type: string;
-}
-
-export interface ServerEvent {
-  type: string;
-  event_id?: string;
-  item_id?: string;
-  transcript?: string;
-  delta?: string;
-  session?: {
-    id?: string;
-  };
-  item?: {
-    id?: string;
-    object?: string;
-    type?: string;
-    status?: string;
-    name?: string;
-    arguments?: string;
-    role?: "user" | "assistant";
-    content?: {
-      type?: string;
-      transcript?: string | null;
-      text?: string;
-    }[];
-  };
-  response?: {
-    output?: {
-      id: string;
-      type?: string;
-      name?: string;
-      arguments?: any;
-      call_id?: string;
-      role: string;
-      content?: any;
-    }[];
-    metadata: Record<string, any>;
-    status_details?: {
-      error?: any;
-    };
-  };
-}
-
-export interface LoggedEvent {
-  id: number;
-  direction: "client" | "server";
-  expanded: boolean;
-  timestamp: string;
-  eventName: string;
-  eventData: Record<string, any>; // can have arbitrary objects logged
-}
-
-// Update the GuardrailOutputZod schema to use the shared ModerationCategoryZod
-export const GuardrailOutputZod = z.object({
-  moderationRationale: z.string(),
-  moderationCategory: ModerationCategoryZod,
-  testText: z.string().optional(),
-});
-
-export type GuardrailOutput = z.infer<typeof GuardrailOutputZod>;
