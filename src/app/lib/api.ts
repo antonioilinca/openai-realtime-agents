@@ -27,6 +27,9 @@ const ensureApiPath = (pathname: string) => {
   return `${normalised}/api`;
 };
 
+const LOCAL_DEV_PORT = "3000";
+const DEFAULT_API_BASE = "http://localhost:8000/api";
+
 const normaliseEnvUrl = (rawValue: string): string | null => {
   const candidate = rawValue.trim();
   if (!candidate) {
@@ -62,15 +65,26 @@ export function resolveApiBase(): string {
 
   if (typeof window !== "undefined") {
     const { protocol, hostname, port } = window.location;
-    if (hostname === "localhost" || hostname === "127.0.0.1") {
-      const apiPort = port && port !== "3000" ? port : "8000";
-      return `${protocol}//${hostname}:${apiPort}/api`;
+    if (port === LOCAL_DEV_PORT) {
+      const targetHost = hostname === "0.0.0.0" ? "localhost" : hostname;
+      return `${protocol}//${targetHost}:8000/api`;
+    }
+    if (
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "0.0.0.0" ||
+      hostname.endsWith(".localhost")
+    ) {
+      const effectiveHost = hostname === "0.0.0.0" ? "localhost" : hostname;
+      const apiPort = port && port !== "" ? port : "8000";
+      const normalisedPort = apiPort === "80" ? "8000" : apiPort;
+      return `${protocol}//${effectiveHost}:${normalisedPort}/api`;
     }
     const portSuffix = port ? `:${port}` : "";
     return `${protocol}//${hostname}${portSuffix}/api`;
   }
 
-  return "http://localhost:8000/api";
+  return DEFAULT_API_BASE;
 }
 
 let authToken: string | null = null;
@@ -80,32 +94,56 @@ export function setAuthToken(token: string | null) {
 }
 
 async function jsonFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const base = resolveApiBase();
-  let response: Response;
-  try {
-    response = await fetch(`${base}${path}`, {
-      ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options.headers ?? {}),
-        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-      },
-    });
-  } catch (error) {
-    throw new Error(
-      "Connexion au serveur Lexora impossible. Vérifiez que le backend est démarré et accessible.",
-    );
+  const primaryBase = resolveApiBase();
+  const tried = new Set<string>();
+  const bases: string[] = [primaryBase];
+
+  if (primaryBase !== DEFAULT_API_BASE) {
+    bases.push(DEFAULT_API_BASE);
   }
 
-  const contentType = response.headers.get("content-type") ?? "";
-  const isJson = contentType.includes("application/json");
-  const payload = isJson ? await response.json() : await response.text();
+  const { headers: providedHeaders, ...rest } = options;
+  const requestBody = rest.body;
 
-  if (!response.ok) {
+  let lastError: Error | null = null;
+
+  for (const base of bases) {
+    if (tried.has(base)) {
+      continue;
+    }
+    tried.add(base);
+
+    let response: Response;
+    try {
+      response = await fetch(`${base}${path}`, {
+        ...rest,
+        body: requestBody,
+        headers: {
+          "Content-Type": "application/json",
+          ...(providedHeaders ?? {}),
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+      });
+    } catch (error) {
+      lastError = new Error(
+        "Connexion au serveur Lexora impossible. Vérifiez que le backend est démarré et accessible.",
+      );
+      continue;
+    }
+
+    const contentType = response.headers.get("content-type") ?? "";
+    const isJson = contentType.includes("application/json");
+    const payload = isJson ? await response.json() : await response.text();
+
+    if (response.ok) {
+      return payload as T;
+    }
+
     if (!isJson && typeof payload === "string" && payload.includes("This page could not be found")) {
-      throw new Error(
+      lastError = new Error(
         "Le backend Lexora n'est pas accessible via l'URL configurée. Vérifiez NEXT_PUBLIC_API_URL ou le port 8000.",
       );
+      continue;
     }
     if (isJson && payload && typeof payload === "object") {
       const detail = (payload as { detail?: unknown }).detail;
@@ -125,7 +163,7 @@ async function jsonFetch<T>(path: string, options: RequestInit = {}): Promise<T>
     throw new Error(`Request failed (${response.status})`);
   }
 
-  return payload as T;
+  throw lastError ?? new Error("Connexion au serveur Lexora impossible.");
 }
 
 export async function analyzeSituation(payload: AnalyzeRequest): Promise<AnalysisResponse> {

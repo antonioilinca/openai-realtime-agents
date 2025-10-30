@@ -63,6 +63,24 @@ describe("resolveApiBase", () => {
     expect(resolveApiBase()).toBe("http://localhost:8000/api");
   });
 
+  it("switches to backend port 8000 even on custom dev hostnames", () => {
+    process.env.NEXT_PUBLIC_API_URL = "";
+    const mockLocation = {
+      protocol: "http:",
+      hostname: "192.168.1.10",
+      port: "3000",
+    } as unknown as Location;
+
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      enumerable: true,
+      value: { location: mockLocation },
+      writable: true,
+    });
+
+    expect(resolveApiBase()).toBe("http://192.168.1.10:8000/api");
+  });
+
   it("defaults to localhost:8000/api when no browser context is present", () => {
     process.env.NEXT_PUBLIC_API_URL = "";
     Object.defineProperty(globalThis, "window", {
