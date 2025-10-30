@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import List
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -29,6 +31,10 @@ class Settings(BaseSettings):
     jwt_secret: str = Field("demo-secret", alias="JWT_SECRET")
     pdf_base_url: str = Field("http://localhost:3000", alias="PDF_BASE_URL")
     openfisca_api_url: str = Field("https://api.openfisca.fr", alias="OPENFISCA_API_URL")
+    cors_allowed_origins: List[str] = Field(
+        default_factory=lambda: ["http://localhost:3000", "http://127.0.0.1:3000"],
+        alias="CORS_ALLOWED_ORIGINS",
+    )
 
 
 @lru_cache(maxsize=1)

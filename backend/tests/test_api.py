@@ -59,6 +59,21 @@ def test_healthcheck() -> None:
     assert payload["status"] == "ok"
 
 
+def test_cors_preflight_allows_frontend_origin() -> None:
+    response = client.options(
+        "/api/auth/signup",
+        headers={
+            "origin": "http://localhost:3000",
+            "access-control-request-method": "POST",
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers.get("access-control-allow-origin") == "http://localhost:3000"
+    allow_methods = response.headers.get("access-control-allow-methods")
+    assert allow_methods is not None
+    assert "POST" in allow_methods
+
+
 def test_signup_and_profile(individual_account: tuple[str, dict[str, str]]) -> None:
     token, profile = individual_account
     assert profile["accountType"] == "individual"
