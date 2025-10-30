@@ -1,0 +1,30 @@
+/* Styles globaux Tailwind pour LexaIA (thème clair/sombre). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: #f5f7fa;
+}
+
+.card-shadow {
+  @apply shadow-lg shadow-primary/10;
+}
+
+.step-indicator {
+  @apply flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary text-sm font-semibold text-primary;
+}

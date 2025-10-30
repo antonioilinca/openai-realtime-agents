@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rapport juridique LexaIA</title>
+    <!-- Modèle PDF stylisé pour les exports LexaIA. -->
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        padding: 32px;
+        background: #f5f7fa;
+        color: #111827;
+      }
+      header {
+        border-bottom: 2px solid #1a3e8c;
+        padding-bottom: 16px;
+        margin-bottom: 24px;
+      }
+      h1 {
+        color: #1a3e8c;
+        margin: 0;
+      }
+      h2 {
+        color: #1a3e8c;
+        border-left: 4px solid #d4af37;
+        padding-left: 8px;
+        margin-top: 32px;
+      }
+      .section {
+        background: #ffffff;
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(26, 62, 140, 0.1);
+      }
+      ul, ol {
+        padding-left: 18px;
+      }
+      footer {
+        margin-top: 40px;
+        font-size: 12px;
+        text-align: center;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Rapport juridique LexaIA</h1>
+      <p>Généré le {{ generated_at }}</p>
+    </header>
+
+    <section class="section">
+      <h2>Résumé du problème</h2>
+      <p>{{ analysis.summary }}</p>
+    </section>
+
+    <section class="section">
+      <h2>Articles applicables</h2>
+      <ul>
+        {% for article in analysis.articles %}
+        <li>
+          <strong>{{ article.code }} - {{ article.article }}</strong><br />
+          {{ article.titre }}<br />
+          {% if article.resume %}<em>{{ article.resume }}</em><br />{% endif %}
+          <a href="{{ article.lien }}">Lien officiel</a>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>Analyse juridique simplifiée</h2>
+      <p>{{ analysis.summary }}</p>
+    </section>
+
+    <section class="section">
+      <h2>Recours possibles</h2>
+      <ol>
+        {% for action in analysis.actions %}
+        <li>{{ action }}</li>
+        {% endfor %}
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>Probabilité de succès</h2>
+      <p>{{ analysis.success_score | round(0) }}%</p>
+    </section>
+
+    <section class="section">
+      <h2>Sources officielles</h2>
+      <ul>
+        {% for source in analysis.sources %}
+        <li>{{ source }}</li>
+        {% endfor %}
+      </ul>
+    </section>
+
+    <footer>
+      Mention légale : « LexaIA est un outil informatif. Seul un avocat peut fournir un conseil juridique. »
+    </footer>
+  </body>
+</html>
