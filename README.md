@@ -58,6 +58,10 @@ make start              # Lance l'environnement complet via Docker Compose
 
 L'API FastAPI est accessible sur `http://localhost:8000`, le frontend sur `http://localhost:3000`.
 
+> 💡 Lorsque vous utilisez Docker Compose, le service frontend reçoit automatiquement l'URL `http://backend:8000/api` pour
+> communiquer avec l'API. En développement hors Docker (`npm run dev`), conservez la valeur par défaut
+> `http://localhost:8000/api` dans votre `.env`.
+
 ### Authentification API
 
 Les routes d'analyse et de génération nécessitent un jeton de session (`Authorization: Bearer <token>`). Utilisez :
@@ -78,6 +82,7 @@ Copiez `.env.example` vers `.env` puis complétez :
 - `OPENAI_API_KEY`
 - `DB_URL`, `OPENSEARCH_URL`, `REDIS_URL`
 - `JWT_SECRET`, `PDF_BASE_URL`
+- `NEXT_PUBLIC_API_URL` (URL de base de l'API consommée par le frontend ; `http://localhost:8000/api` en local)
 
 ## Tests
 
