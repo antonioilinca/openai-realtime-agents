@@ -1,0 +1,33 @@
+// Schéma Prisma décrivant les utilisateurs et les analyses LexaIA.
+generator client {
+  provider = "prisma-client-py"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  password_hash String
+  created_at    DateTime  @default(now())
+  analyses      Analysis[]
+}
+
+model Analysis {
+  id            Int      @id @default(autoincrement())
+  user          User?    @relation(fields: [user_id], references: [id])
+  user_id       Int?
+  text          String
+  domain        String
+  keywords      Json
+  articles      Json
+  summary       String
+  actions       Json
+  success_score Float
+  sources       Json
+  created_at    DateTime @default(now())
+  cached_until  DateTime
+}
