@@ -1,14 +1,24 @@
 import type {
   AnalyzeRequest,
   AnalysisResponse,
+  AuthResponse,
   DocumentRequest,
   DocumentResponse,
+  LoginRequest,
   PlanRequest,
   PlanResponse,
+  SignupRequest,
   SourceLogResponse,
+  UserProfile,
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api";
+
+let authToken: string | null = null;
+
+export function setAuthToken(token: string | null) {
+  authToken = token;
+}
 
 async function jsonFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
@@ -16,6 +26,7 @@ async function jsonFetch<T>(path: string, options: RequestInit = {}): Promise<T>
     headers: {
       "Content-Type": "application/json",
       ...(options.headers ?? {}),
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
     },
   });
 
@@ -50,4 +61,22 @@ export async function generateDocument(payload: DocumentRequest): Promise<Docume
 
 export async function fetchSources(planId: string): Promise<SourceLogResponse> {
   return jsonFetch<SourceLogResponse>(`/sources/${planId}`);
+}
+
+export async function signup(payload: SignupRequest): Promise<AuthResponse> {
+  return jsonFetch<AuthResponse>("/auth/signup", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function login(payload: LoginRequest): Promise<AuthResponse> {
+  return jsonFetch<AuthResponse>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function fetchProfile(): Promise<UserProfile> {
+  return jsonFetch<UserProfile>("/auth/profile");
 }

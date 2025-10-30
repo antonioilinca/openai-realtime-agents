@@ -4,9 +4,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal, Sequence
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr, Field, constr
 
 Domain = Literal["conso", "logement", "travail"]
+AccountType = Literal["individual", "company"]
 
 
 class ClassificationEntities(BaseModel):
@@ -60,6 +61,7 @@ class PlanResponse(BaseModel):
     costs: list[str] = Field(default_factory=list)
     authorities: list[str] = Field(default_factory=list)
     kpis: dict[str, Any] = Field(default_factory=dict)
+    audience_focus: str | None = None
 
 
 class PlanRequest(BaseModel):
@@ -87,4 +89,30 @@ class SourceLogItem(BaseModel):
 
 class SourceLogResponse(BaseModel):
     items: Sequence[SourceLogItem]
+
+
+class SignupRequest(BaseModel):
+    email: EmailStr
+    password: constr(min_length=8)
+    account_type: AccountType = Field(alias="accountType")
+    full_name: constr(min_length=2, max_length=120) = Field(alias="fullName")
+    company_name: str | None = Field(default=None, alias="companyName")
+
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: constr(min_length=8)
+
+
+class UserProfile(BaseModel):
+    user_id: str = Field(alias="userId")
+    email: EmailStr
+    account_type: AccountType = Field(alias="accountType")
+    display_name: str = Field(alias="displayName")
+    company_name: str | None = Field(default=None, alias="companyName")
+
+
+class AuthResponse(BaseModel):
+    token: str
+    profile: UserProfile
 

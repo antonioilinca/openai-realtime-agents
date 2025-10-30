@@ -1,5 +1,7 @@
 export type Domain = "conso" | "logement" | "travail";
 
+export type AccountType = "individual" | "company";
+
 export interface AnalyzeRequest {
   situation: string;
   domain: Domain;
@@ -56,6 +58,7 @@ export interface PlanResponse {
   costs: string[];
   authorities: string[];
   kpis: Record<string, unknown>;
+  audience_focus?: string | null;
 }
 
 export interface DocumentRequest {
@@ -78,6 +81,32 @@ export interface SourceLogItem {
 
 export interface SourceLogResponse {
   items: SourceLogItem[];
+}
+
+export interface SignupRequest {
+  email: string;
+  password: string;
+  accountType: AccountType;
+  fullName: string;
+  companyName?: string | null;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface UserProfile {
+  userId: string;
+  email: string;
+  accountType: AccountType;
+  displayName: string;
+  companyName?: string | null;
+}
+
+export interface AuthResponse {
+  token: string;
+  profile: UserProfile;
 }
 
 export interface ProcedurePreview {

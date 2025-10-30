@@ -12,6 +12,7 @@ Lexora est une plateforme d'information juridique assistée par IA. Elle combine
 - **Procedure Engine** : transformation d'une analyse en plan d'actions actionnable (étapes, délais, autorités, coûts, pièces).
 - **Document Generator** : gabarits HTML → PDF (mise en demeure, contestation, courrier RH) avec charte graphique Lexora.
 - **Frontend Next.js** : parcours guidé (onboarding, formulaire, analyse, plan, exports) respectant les contrastes WCAG 2.1 AA.
+- **Comptes utilisateurs** : création et connexion pour particuliers ou entreprises avec mise en avant des parcours adaptés.
 - **Infrastructure Docker** : services orchestrés (FastAPI, Next.js, PostgreSQL, Redis, OpenSearch) pour un déploiement reproductible.
 
 ## Structure du dépôt
@@ -56,6 +57,18 @@ make start              # Lance l'environnement complet via Docker Compose
 ```
 
 L'API FastAPI est accessible sur `http://localhost:8000`, le frontend sur `http://localhost:3000`.
+
+### Authentification API
+
+Les routes d'analyse et de génération nécessitent un jeton de session (`Authorization: Bearer <token>`). Utilisez :
+
+```http
+POST /api/auth/signup   # body : {"email","password","accountType","fullName","companyName?"}
+POST /api/auth/login    # body : {"email","password"}
+GET  /api/auth/profile  # retourne le profil courant
+```
+
+Les comptes `company` valorisent les recommandations pour les obligations employeur et les litiges commerciaux, tout en conservant l'accès à l'ensemble des domaines juridiques.
 
 ## Variables d'environnement
 
