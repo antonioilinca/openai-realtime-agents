@@ -14,10 +14,50 @@ import type {
 
 const trimTrailingSlash = (value: string) => value.replace(/\/$/, "");
 
-function resolveApiBase(): string {
-  const fromEnv = process.env.NEXT_PUBLIC_API_URL?.trim();
-  if (fromEnv) {
-    return trimTrailingSlash(fromEnv);
+const ensureApiPath = (pathname: string) => {
+  if (!pathname || pathname === "/") {
+    return "/api";
+  }
+
+  const normalised = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  if (normalised.endsWith("/api")) {
+    return normalised;
+  }
+
+  return `${normalised}/api`;
+};
+
+const normaliseEnvUrl = (rawValue: string): string | null => {
+  const candidate = rawValue.trim();
+  if (!candidate) {
+    return null;
+  }
+
+  const hasScheme = candidate.includes("://");
+  const looksLikeHost = /^[a-z0-9.-]+(?::\d+)?$/i.test(candidate);
+
+  if (!hasScheme && !looksLikeHost) {
+    // Likely a relative path (e.g. "/api") – fallback to runtime detection.
+    return null;
+  }
+
+  try {
+    const url = new URL(hasScheme ? candidate : `http://${candidate}`);
+    url.pathname = ensureApiPath(url.pathname);
+    url.search = "";
+    url.hash = "";
+    return trimTrailingSlash(url.toString());
+  } catch (error) {
+    console.warn("NEXT_PUBLIC_API_URL invalide, retour au comportement par défaut", error);
+    return null;
+  }
+};
+
+export function resolveApiBase(): string {
+  const fromEnv = process.env.NEXT_PUBLIC_API_URL;
+  const normalisedEnv = fromEnv ? normaliseEnvUrl(fromEnv) : null;
+  if (normalisedEnv) {
+    return normalisedEnv;
   }
 
   if (typeof window !== "undefined") {
@@ -62,6 +102,11 @@ async function jsonFetch<T>(path: string, options: RequestInit = {}): Promise<T>
   const payload = isJson ? await response.json() : await response.text();
 
   if (!response.ok) {
+    if (!isJson && typeof payload === "string" && payload.includes("This page could not be found")) {
+      throw new Error(
+        "Le backend Lexora n'est pas accessible via l'URL configurée. Vérifiez NEXT_PUBLIC_API_URL ou le port 8000.",
+      );
+    }
     if (isJson && payload && typeof payload === "object") {
       const detail = (payload as { detail?: unknown }).detail;
       if (typeof detail === "string") {

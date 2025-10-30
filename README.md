@@ -82,7 +82,7 @@ Copiez `.env.example` vers `.env` puis complétez :
 - `OPENAI_API_KEY`
 - `DB_URL`, `OPENSEARCH_URL`, `REDIS_URL`
 - `JWT_SECRET`, `PDF_BASE_URL`
-- `NEXT_PUBLIC_API_URL` (URL de base de l'API consommée par le frontend ; `http://localhost:8000/api` en local)
+- `NEXT_PUBLIC_API_URL` (URL de base de l'API consommée par le frontend ; `http://localhost:8000` est accepté et normalisé vers `/api`)
 
 ## Tests
 
