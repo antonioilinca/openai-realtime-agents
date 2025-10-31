@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Serpent: Next-Gen Snake</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&family=Rajdhani:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <canvas id="game-canvas" width="900" height="600"></canvas>
+      <div id="hud"></div>
+      <div id="menus">
+        <section id="main-menu" class="menu active">
+          <h1>Neon Serpent</h1>
+          <p class="subtitle">A premium reimagining of the classic Snake.</p>
+          <button data-action="start">Start Game</button>
+          <button data-action="skins">Skins</button>
+          <button data-action="leaderboard">Leaderboard</button>
+          <button data-action="settings">Settings</button>
+          <button data-action="about">About</button>
+        </section>
+        <section id="pause-menu" class="menu">
+          <h2>Game Paused</h2>
+          <button data-action="resume">Resume</button>
+          <button data-action="restart">Restart</button>
+          <button data-action="main">Main Menu</button>
+        </section>
+        <section id="post-menu" class="menu">
+          <h2>Run Complete</h2>
+          <div class="summary"></div>
+          <button data-action="replay">Play Again</button>
+          <button data-action="share">Share</button>
+          <button data-action="main">Main Menu</button>
+        </section>
+        <section id="skins-menu" class="menu">
+          <h2>Unlockable Skins</h2>
+          <div class="skins-grid"></div>
+          <button data-action="back">Back</button>
+        </section>
+        <section id="leaderboard-menu" class="menu">
+          <h2>Local Leaderboard</h2>
+          <ol class="leaderboard-list"></ol>
+          <button data-action="back">Back</button>
+        </section>
+        <section id="settings-menu" class="menu">
+          <h2>Settings</h2>
+          <label>
+            Music Volume
+            <input type="range" id="music-volume" min="0" max="1" step="0.05" />
+          </label>
+          <label>
+            FX Volume
+            <input type="range" id="fx-volume" min="0" max="1" step="0.05" />
+          </label>
+          <label class="toggle">
+            <input type="checkbox" id="multiplayer-toggle" />
+            Multiplayer Arena (experimental)
+          </label>
+          <button data-action="back">Back</button>
+        </section>
+        <section id="about-menu" class="menu">
+          <h2>About</h2>
+          <p>
+            Neon Serpent blends the timeless Snake formula with modern visuals, reactive audio,
+            and evolving arenas. Built for both desktop and mobile, it features power-ups,
+            combos, unlockable skins, and optional multiplayer.
+          </p>
+          <button data-action="back">Back</button>
+        </section>
+      </div>
+      <div id="touch-controls">
+        <div class="touch-button" data-direction="up">▲</div>
+        <div class="touch-mid">
+          <div class="touch-button" data-direction="left">◄</div>
+          <div class="touch-button" data-direction="down">▼</div>
+          <div class="touch-button" data-direction="right">►</div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
