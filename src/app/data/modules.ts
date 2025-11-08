@@ -265,6 +265,134 @@ export const modules: ModuleDefinition[] = [
   },
   {
     id: "module-3",
+    title: "Textes dynamiques et calculs",
+    duration: "55 min",
+    objective:
+      "Assembler des nombres et des chaînes avec des opérations simples, des conversions et des f-strings.",
+    motivation:
+      "Tu vas mettre en forme des messages dynamiques : Python devient ton assistant pour expliquer des résultats clairs.",
+    concept: {
+      title: "Mixer chiffres et phrases",
+      body: [
+        "Les opérateurs +, -, *, / permettent de réaliser des calculs.",
+        "Pour mélanger nombres et texte, utilise str() ou les f-strings (f\"{variable}\").",
+        "round(nombre, 2) arrondit un résultat à deux décimales.",
+      ],
+      analogies: [
+        "Une f-string est comme un gabarit de carte postale où tu glisses tes valeurs à l'intérieur.",
+        "Les conversions sont des traducteurs : int() transforme un texte '42' en nombre 42.",
+      ],
+      highlights: [
+        "Ajoute des parenthèses pour contrôler l'ordre des opérations.",
+        "Utilise // pour la division entière et % pour obtenir le reste.",
+      ],
+    },
+    demonstration: {
+      code: 'minutes_pratique = 45\nmodules_realises = 2\nratio = minutes_pratique / 60\nprint(f"Tu as déjà complété {modules_realises} modules !")\nprint(f"Cela représente {round(ratio * 100, 1)}% d\'une heure dédiée à Python.")',
+      explanation: [
+        "ratio contient un calcul intermédiaire que l'on arrondit pour le rendre lisible.",
+        "Les f-strings permettent d'inclure directement les valeurs dans la phrase.",
+      ],
+      callToAction: "Modifie les nombres pour afficher ton propre rythme d'apprentissage.",
+    },
+    exercise: {
+      id: "module-3-exo",
+      title: "Plan de session",
+      instructions:
+        "Crée une variable duree_totale en minutes (ex : 120). Calcule combien d'heures et de minutes cela représente et affiche le résultat avec une phrase claire.",
+      starterCode:
+        "duree_totale = 120\nheures = duree_totale // 60\nminutes_restantes = duree_totale % 60\n\nprint(f\"Ta session dure {heures} heure(s) et {minutes_restantes} minute(s).\")\n",
+      tests: [
+        {
+          code: "assert heures == duree_totale // 60, 'Calcule le nombre d\"heures avec //.'",
+          description: "Calcul des heures",
+        },
+        {
+          code: "assert minutes_restantes == duree_totale % 60, 'Utilise % pour obtenir le reste en minutes.'",
+          description: "Calcul des minutes",
+        },
+        {
+          code: "assert 'heure' in __captured_output__, 'Explique ton résultat avec une phrase complète.'",
+          description: "Phrase explicative",
+        },
+      ],
+      successMessage: "Lecture du planning validée !",
+      hints: {
+        baseline: "// donne le quotient entier, % donne le reste.",
+        remedial: "heures = duree_totale // 60 et minutes_restantes = duree_totale % 60",
+        advanced: "Ajoute le nombre total de secondes avec duree_totale * 60.",
+      },
+    },
+    challenge: {
+      id: "module-3-defi",
+      title: "Score de quiz",
+      instructions:
+        "Calcule un pourcentage de réussite : points_obtenus / points_totaux * 100. Affiche un message différent selon que le score est <50, entre 50 et 80, ou ≥80.",
+      starterCode:
+        "points_obtenus = 17\npoints_totaux = 20\n\nscore = round(points_obtenus / points_totaux * 100, 1)\n\nif score < 50:\n    message = 'On reprend calmement les bases.'\nelif score < 80:\n    message = 'Beau score, continue !'\nelse:\n    message = 'Excellent, tu maîtrises !'\n\nprint(f\"Résultat : {score}% - {message}\")\n",
+      tests: [
+        {
+          code: "assert isinstance(score, float), 'Calcule le score en pourcentage.'",
+          description: "Score numérique",
+        },
+        {
+          code: "assert score == round(points_obtenus / points_totaux * 100, 1), 'Arrondis ton score à une décimale.'",
+          description: "Arrondi correct",
+        },
+        {
+          code: "assert any(mot in __captured_output__ for mot in ['bases', 'continue', 'maîtrises']), 'Affiche un message adapté.'",
+          description: "Feedback dynamique",
+        },
+      ],
+      successMessage: "Score calculé comme un pro !",
+      hints: {
+        baseline: "Multiplie par 100 pour obtenir un pourcentage.",
+        remedial: "score = round(points_obtenus / points_totaux * 100, 1)",
+        advanced: "Personnalise le message avec le prénom de l'utilisateur.",
+      },
+      reflection: "Quel indicateur aimerais-tu suivre automatiquement (progression, motivation, pauses...) ?",
+    },
+    quiz: {
+      id: "module-3-quiz",
+      title: "Quiz éclair : combiner texte et chiffres",
+      questions: [
+        {
+          id: "m3q1",
+          prompt: "Quel symbole récupère le reste d'une division ?",
+          options: ["%", "//", "**"],
+          answerIndex: 0,
+          explanation: "% renvoie le reste de la division entière.",
+        },
+        {
+          id: "m3q2",
+          prompt: "Quelle syntaxe permet d'insérer directement une variable dans du texte ?",
+          options: ["text(${variable})", "f\"{variable}\"", "print(variable)"],
+          answerIndex: 1,
+          explanation: "Les f-strings commencent par f et contiennent des accolades.",
+        },
+        {
+          id: "m3q3",
+          prompt: "round(12.345, 2) renvoie :",
+          options: ["12.34", "12.35", "12"],
+          answerIndex: 1,
+          explanation: "round arrondit à deux décimales : 12.35.",
+        },
+      ],
+    },
+    bonus: {
+      title: "Bonus : statistiques rapides",
+      description:
+        "Explore les fonctions min(), max() et sum() pour analyser rapidement une liste de notes.",
+      resources: [
+        {
+          label: "Tutoriel : opérations mathématiques",
+          url: "https://docs.python.org/fr/3/library/math.html",
+        },
+      ],
+    },
+  },
+  {
+    id: "module-4",
     title: "Conditions et logique",
     duration: "55 min",
     objective: "Construire des décisions avec if, elif et else.",
@@ -295,7 +423,7 @@ export const modules: ModuleDefinition[] = [
       callToAction: "Change la valeur de temperature pour voir quelle phrase est choisie.",
     },
     exercise: {
-      id: "module-3-exo",
+      id: "module-4-exo",
       title: "Contrôleur de cinéma",
       instructions:
         "Ajoute une variable tarif. Si age est inférieur à 18, stocke 'Tarif réduit', sinon 'Plein tarif'. Affiche ensuite la valeur de tarif.",
@@ -319,7 +447,7 @@ export const modules: ModuleDefinition[] = [
       },
     },
     challenge: {
-      id: "module-3-defi",
+      id: "module-4-defi",
       title: "Feu tricolore",
       instructions:
         "Crée une variable couleur qui vaut 'rouge', 'orange' ou 'vert'. Utilise if/elif/else pour afficher l'action correspondante : stop, ralentis, avance.",
@@ -344,25 +472,25 @@ export const modules: ModuleDefinition[] = [
       reflection: "Dans quel autre contexte utiliserais-tu des conditions pour réagir à une situation ?",
     },
     quiz: {
-      id: "module-3-quiz",
+      id: "module-4-quiz",
       title: "Quiz éclair : prendre des décisions",
       questions: [
         {
-          id: "m3q1",
+          id: "m4q1",
           prompt: "Quel mot-clé teste une nouvelle condition si la première est fausse ?",
           options: ["elseif", "elif", "else"],
           answerIndex: 1,
           explanation: "elif signifie 'sinon si' en Python.",
         },
         {
-          id: "m3q2",
+          id: "m4q2",
           prompt: "Quelle comparaison vérifie l'égalité entre deux valeurs ?",
           options: ["=", "==", "!"],
           answerIndex: 1,
           explanation: "== compare deux valeurs en Python.",
         },
         {
-          id: "m3q3",
+          id: "m4q3",
           prompt: "Comment représenter 'sinon' en Python ?",
           options: ["otherwise", "else", "default"],
           answerIndex: 1,
@@ -383,7 +511,7 @@ export const modules: ModuleDefinition[] = [
     },
   },
   {
-    id: "module-4",
+    id: "module-5",
     title: "Boucles for et while",
     duration: "60 min",
     objective: "Répéter des actions automatiquement avec for et while.",
@@ -414,7 +542,7 @@ export const modules: ModuleDefinition[] = [
       callToAction: "Ajoute un montant supplémentaire et relance la démonstration.",
     },
     exercise: {
-      id: "module-4-exo",
+      id: "module-5-exo",
       title: "Compteur de pompes",
       instructions:
         "Utilise une boucle for avec range pour afficher les nombres de 1 à 5 inclus.",
@@ -422,7 +550,7 @@ export const modules: ModuleDefinition[] = [
         "for numero in range(1, 6):\n    print('Pompe', numero)\n",
       tests: [
         {
-          code: "lignes = [ligne for ligne in __captured_output__.split('\n') if ligne]\nassert len(lignes) == 5, 'Affiche exactement cinq lignes.'",
+          code: "lignes = [ligne for ligne in __captured_output__.split('\\n') if ligne]\nassert len(lignes) == 5, 'Affiche exactement cinq lignes.'",
           description: "Cinq répétitions",
         },
         {
@@ -438,7 +566,7 @@ export const modules: ModuleDefinition[] = [
       },
     },
     challenge: {
-      id: "module-4-defi",
+      id: "module-5-defi",
       title: "Scanner de liste",
       instructions:
         "Parcours la liste notes = [12, 18, 9, 15]. Affiche seulement les notes supérieures ou égales à 15.",
@@ -450,7 +578,7 @@ export const modules: ModuleDefinition[] = [
           description: "Notes retenues",
         },
         {
-          code: "assert '12' not in __captured_output__, 'N\"affiche pas les notes inférieures à 15.'",
+          code: "assert '12' not in __captured_output__, 'N'affiche pas les notes inférieures à 15.'",
           description: "Filtrage correct",
         },
       ],
@@ -463,25 +591,25 @@ export const modules: ModuleDefinition[] = [
       reflection: "Quelle tâche répétitive aimerais-tu automatiser avec une boucle ?",
     },
     quiz: {
-      id: "module-4-quiz",
+      id: "module-5-quiz",
       title: "Quiz éclair : répéter intelligemment",
       questions: [
         {
-          id: "m4q1",
+          id: "m5q1",
           prompt: "Que renvoie range(3) ?",
           options: ["0,1,2", "1,2,3", "3,2,1"],
           answerIndex: 0,
           explanation: "range(3) génère 0,1,2. Ajoute 1 pour démarrer à 1.",
         },
         {
-          id: "m4q2",
+          id: "m5q2",
           prompt: "Comment arrêter une boucle immédiatement ?",
           options: ["stop", "break", "exit"],
           answerIndex: 1,
           explanation: "break quitte la boucle en cours.",
         },
         {
-          id: "m4q3",
+          id: "m5q3",
           prompt: "Quelle boucle répète tant qu'une condition reste vraie ?",
           options: ["for", "while", "loop"],
           answerIndex: 1,
@@ -502,255 +630,873 @@ export const modules: ModuleDefinition[] = [
     },
   },
   {
-    id: "module-5",
-    title: "Fonctions et réutilisation",
-    duration: "55 min",
-    objective: "Créer des fonctions pour organiser son code et éviter les répétitions.",
+    id: "module-6",
+    title: "Listes et dictionnaires",
+    duration: "65 min",
+    objective:
+      "Structurer plusieurs informations et les modifier facilement avec les méthodes de liste et de dictionnaire.",
     motivation:
-      "Tu vas fabriquer tes propres mini-outils réutilisables. Les fonctions transforment ton code en boîte à outils personnelle !",
+      "Tu vas organiser des données comme un pro : des listes pour tes tâches, des dictionnaires pour tes profils utilisateurs.",
     concept: {
-      title: "Définir une fonction",
+      title: "Collections ordonnées et associatives",
       body: [
-        "Une fonction regroupe des instructions sous un nom que tu peux appeler plusieurs fois.",
-        "Les paramètres sont les informations que tu donnes à la fonction.",
-        "return renvoie un résultat que tu peux stocker dans une variable.",
+        "Une liste [] garde un ordre et peut contenir différents types.",
+        "Un dictionnaire {} associe une clé à une valeur (clé: valeur).",
+        "append(), pop(), keys(), values() sont des méthodes courantes.",
       ],
       analogies: [
-        "Une fonction est une machine à chocolat chaud : tu verses du lait (paramètre) et tu reçois une boisson (résultat).",
-        "Définir une fonction, c'est écrire une formule magique que tu peux réciter à volonté.",
+        "Une liste est une file d'attente : les éléments sont rangés les uns derrière les autres.",
+        "Un dictionnaire est une armoire à casiers étiquetés : chaque clé ouvre sur une information précise.",
       ],
       highlights: [
-        "Utilise def nom_fonction(param): pour déclarer une fonction.",
-        "Les variables définies dans la fonction ne sont visibles qu'à l'intérieur.",
+        "On accède à un élément de liste par son index (liste[0]).",
+        "On accède à un dictionnaire par sa clé (profil['prenom']).",
       ],
     },
     demonstration: {
-      code: 'def saluer(prenom):\n    message = f"Bonjour {prenom} !"\n    return message\n\nprint(saluer("Imani"))',
+      code: "taches = ['Pratiquer 20 minutes', 'Relire mes notes', 'Boire de l'eau']\nprofil = {'prenom': 'Noa', 'niveau': 'débutant', 'objectif': 'automatiser ses finances'}\n\nprint('Tâche du jour :', taches[0])\nprofil['niveau'] = 'motivé'\nprint('Profil mis à jour :', profil)",
       explanation: [
-        "La fonction saluer reçoit un prénom et renvoie un message personnalisé.",
-        "return permet d'utiliser la valeur retournée dans un print ou ailleurs.",
+        "On accède au premier élément de la liste avec l'index 0.",
+        "On modifie la valeur d'une clé dans le dictionnaire comme si l'on remplaçait la fiche d'un casier.",
       ],
-      callToAction: "Appelle la fonction avec ton prénom pour vérifier que tu es bien salué.",
+      callToAction: "Ajoute une nouvelle tâche avec append() et observe la liste évoluer.",
     },
     exercise: {
-      id: "module-5-exo",
-      title: "Calculateur de carrés",
+      id: "module-6-exo",
+      title: "Liste de révisions",
       instructions:
-        "Écris une fonction carre(nombre) qui renvoie le carré du nombre reçu. Affiche ensuite le résultat pour 4 et 9.",
+        "Crée une liste revisions qui contient trois sujets (ex : variables, boucles, fonctions). Affiche le nombre d'éléments puis le dernier sujet à revoir.",
       starterCode:
-        "def carre(nombre):\n    return nombre * nombre\n\nprint(carre(4))\nprint(carre(9))\n",
+        "revisions = ['variables', 'boucles', 'fonctions']\n\nprint('À revoir :', len(revisions), 'sujets')\nprint('Je termine par :', revisions[-1])\n",
       tests: [
         {
-          code: "assert carre(3) == 9, 'La fonction doit renvoyer le carré.'",
-          description: "Carré correct",
+          code: "assert isinstance(revisions, list) and len(revisions) >= 3, 'Ta liste doit contenir au moins trois sujets.'",
+          description: "Liste créée",
         },
         {
-          code: "assert '16' in __captured_output__ and '81' in __captured_output__, 'Affiche le résultat pour 4 et 9.'",
-          description: "Affichages demandés",
+          code: "assert str(len(revisions)) in __captured_output__, 'Affiche le nombre de sujets.'",
+          description: "Affichage du compteur",
+        },
+        {
+          code: "assert revisions[-1] in __captured_output__, 'Montre le dernier élément de ta liste.'",
+          description: "Dernier élément",
         },
       ],
-      successMessage: "Magnifique ! Tu viens de créer un outil mathématique.",
+      successMessage: "Plan de révision prêt !",
       hints: {
-        baseline: "return renvoie la valeur calculée.",
-        remedial: "return nombre * nombre renvoie le produit du nombre par lui-même.",
-        advanced: "Essaie d'ajouter un print explicatif comme 'Le carré de 4 vaut ...'.",
+        baseline: "len(liste) renvoie le nombre d'éléments.",
+        remedial: "Utilise revisions[-1] pour obtenir le dernier élément.",
+        advanced: "Trie ta liste par ordre alphabétique avec revisions.sort().",
       },
     },
     challenge: {
-      id: "module-5-defi",
-      title: "Personnaliseur de messages",
+      id: "module-6-defi",
+      title: "Tableau de bord apprentissage",
       instructions:
-        "Crée une fonction presenter(prenom, objectif) qui renvoie une phrase résumant le projet d'une personne. Teste-la avec au moins deux appels différents.",
+        "Crée un dictionnaire progression avec les clés 'modules_finis', 'minutes', 'motivation'. Mets à jour la clé 'minutes' en ajoutant 30 et affiche chaque information sur une ligne distincte.",
       starterCode:
-        'def presenter(prenom, objectif):\n    return f"{prenom} veut apprendre Python pour {objectif}."\n\nprint(presenter("Lina", "créer un jeu"))\nprint(presenter("Alex", "automatiser ses finances"))\n',
+        "progression = {'modules_finis': 2, 'minutes': 90, 'motivation': 'élevée'}\nprogression['minutes'] += 30\n\nfor cle, valeur in progression.items():\n    print(f\"{cle} : {valeur}\")\n",
       tests: [
         {
-          code: "assert 'veut apprendre Python' in __captured_output__, 'La phrase doit inclure le modèle demandé.'",
-          description: "Structure de phrase",
+          code: "assert isinstance(progression, dict), 'Utilise bien un dictionnaire.'",
+          description: "Structure dictionnaire",
         },
         {
-          code: "assert presenter('Mia', 'lancer un blog') == 'Mia veut apprendre Python pour lancer un blog.', 'Respecte le format de retour.'",
-          description: "Retour exact",
+          code: "assert progression['minutes'] >= 120, 'Ajoute 30 minutes à la progression.'",
+          description: "Mise à jour",
+        },
+        {
+          code: "assert all(clé in __captured_output__ for clé in ['modules_finis', 'minutes', 'motivation']), 'Affiche chaque clé et valeur.'",
+          description: "Affichage complet",
         },
       ],
-      successMessage: "Tes fonctions parlent pour toi !",
+      successMessage: "Dashboard prêt : tu vois tes progrès d'un coup d'œil !",
       hints: {
-        baseline: "Utilise une f-string pour insérer les deux paramètres dans la phrase.",
-        remedial: "return f\"{prenom} veut apprendre Python pour {objectif}.\"",
-        advanced: "Ajoute un paramètre optionnel ton pour varier le style (enthousiaste, posé...).",
+        baseline: "progression['minutes'] += 30 ajoute 30 à la valeur existante.",
+        remedial: "Boucle : for cle, valeur in progression.items(): print(cle, valeur)",
+        advanced: "Ajoute une clé 'objectif' et affiche-la également.",
       },
-      reflection: "Quelle fonction aimerais-tu créer pour te simplifier la vie ?",
+      reflection: "Quelle information voudrais-tu suivre chaque semaine pour mesurer ton apprentissage ?",
     },
     quiz: {
-      id: "module-5-quiz",
-      title: "Quiz éclair : fabriquer des outils",
+      id: "module-6-quiz",
+      title: "Quiz éclair : collections de données",
       questions: [
         {
-          id: "m5q1",
-          prompt: "Que signifie return ?",
-          options: [
-            "Afficher un résultat",
-            "Arrêter la fonction et renvoyer une valeur",
-            "Créer une nouvelle variable globale",
-          ],
-          answerIndex: 1,
-          explanation: "return termine la fonction et renvoie la valeur.",
+          id: "m6q1",
+          prompt: "Quel index récupère le premier élément d'une liste ?",
+          options: ["0", "1", "-1"],
+          answerIndex: 0,
+          explanation: "Les listes commencent à l'index 0 en Python.",
         },
         {
-          id: "m5q2",
-          prompt: "Comment définir une fonction appelée bonjour sans paramètre ?",
-          options: ["function bonjour():", "def bonjour():", "create bonjour()"],
+          id: "m6q2",
+          prompt: "Quelle méthode ajoute un élément à la fin d'une liste ?",
+          options: ["add()", "append()", "push()"],
           answerIndex: 1,
-          explanation: "def bonjour(): est la syntaxe correcte en Python.",
+          explanation: "append() colle l'élément à la fin de la liste.",
         },
         {
-          id: "m5q3",
-          prompt: "Où peut-on utiliser une fonction que l'on a définie ?",
-          options: ["Uniquement dans le fichier actuel", "Partout où le code est exécuté après sa définition", "Nulle part"],
+          id: "m6q3",
+          prompt: "Comment parcourir les paires clé/valeur d'un dictionnaire ?",
+          options: ["for element in dict", "for cle, valeur in dict.items()", "for dict"],
           answerIndex: 1,
-          explanation: "Une fonction peut être appelée partout après sa définition dans le fichier.",
+          explanation: "items() renvoie les couples (clé, valeur).",
         },
       ],
     },
     bonus: {
-      title: "Bonus : arguments optionnels",
+      title: "Bonus : listes imbriquées",
       description:
-        "Ajoute des valeurs par défaut à tes fonctions pour les rendre encore plus flexibles (ex : def saluer(prenom, emoji='🙂')).",
+        "Crée une liste de dictionnaires pour représenter plusieurs apprenants et filtre ceux qui ont terminé plus de 3 modules.",
       resources: [
         {
-          label: "Guide : paramètres par défaut",
+          label: "Documentation : méthodes de liste",
+          url: "https://docs.python.org/fr/3/tutorial/datastructures.html",
+        },
+      ],
+    },
+  },
+  {
+    id: "module-7",
+    title: "Boucles avancées et compréhensions",
+    duration: "60 min",
+    objective:
+      "Optimiser les parcours de listes avec enumerate, zip et les compréhensions de listes.",
+    motivation:
+      "Tu vas rendre ton code plus expressif tout en écrivant moins de lignes : idéal pour analyser rapidement des données.",
+    concept: {
+      title: "Itérations express",
+      body: [
+        "enumerate(liste) fournit l'index et la valeur à chaque tour.",
+        "zip(l1, l2) parcourt deux listes en parallèle.",
+        "Les compréhensions [expression for element in liste] permettent de créer une nouvelle liste en une ligne.",
+      ],
+      analogies: [
+        "enumerate, c'est comme numéroter les pages d'un carnet pendant que tu les lis.",
+        "Une compréhension de liste est une machine à trier qui transforme automatiquement chaque élément.",
+      ],
+      highlights: [
+        "Ajoute une condition dans une compréhension : [x for x in liste if x > 0].",
+        "Utilise sum(...) avec une compréhension pour calculer rapidement un total filtré.",
+      ],
+    },
+    demonstration: {
+      code: "notes = [14, 17, 19]\nfor index, note in enumerate(notes, start=1):\n    print(f'Note {index} : {note}')\n\nbonus = [note + 1 for note in notes]\nprint('Notes bonifiées :', bonus)",
+      explanation: [
+        "enumerate ajoute automatiquement un compteur.",
+        "La compréhension crée une nouvelle liste sans modifier l'originale.",
+      ],
+      callToAction: "Ajoute une condition pour ne bonifier que les notes inférieures à 18.",
+    },
+    exercise: {
+      id: "module-7-exo",
+      title: "Checklist détaillée",
+      instructions:
+        "À partir de la liste objectifs = ['Lire', 'Coder', 'Tester'], affiche chaque objectif numéroté (1 - Lire, etc.) grâce à enumerate.",
+      starterCode:
+        "objectifs = ['Lire', 'Coder', 'Tester']\n\nfor position, nom in enumerate(objectifs, start=1):\n    print(f\"{position} - {nom}\")\n",
+      tests: [
+        {
+          code: "assert '1 - Lire' in __captured_output__, 'Commence la numérotation à 1.'",
+          description: "Première ligne",
+        },
+        {
+          code: "assert all(item in __captured_output__ for item in ['Coder', 'Tester']), 'Affiche tous les objectifs.'",
+          description: "Tous les éléments",
+        },
+      ],
+      successMessage: "Liste numérotée impeccablement !",
+      hints: {
+        baseline: "enumerate(objectifs, start=1) fournit (1, 'Lire'), puis (2, 'Coder'), ...",
+        remedial: "Déstructure la paire : for position, nom in enumerate(...):",
+        advanced: "Ajoute une compréhension pour créer ['✅ Lire', ...].",
+      },
+    },
+    challenge: {
+      id: "module-7-defi",
+      title: "Analyse de progression",
+      instructions:
+        "On te donne minutes = [25, 40, 35, 50]. Crée une nouvelle liste longues_sessions contenant seulement les durées >= 35 grâce à une compréhension, puis affiche la moyenne de ces longues sessions.",
+      starterCode:
+        "minutes = [25, 40, 35, 50]\nlongues_sessions = [duree for duree in minutes if duree >= 35]\n\nif longues_sessions:\n    moyenne = sum(longues_sessions) / len(longues_sessions)\n    print('Sessions solides :', longues_sessions)\n    print('Moyenne :', round(moyenne, 1), 'minutes')\nelse:\n    print('Pas de sessions longues pour le moment.')\n",
+      tests: [
+        {
+          code: "assert longues_sessions == [40, 35, 50], 'Filtre les durées supérieures ou égales à 35.'",
+          description: "Filtre correct",
+        },
+        {
+          code: "assert 'Moyenne' in __captured_output__, 'Affiche la moyenne des sessions filtrées.'",
+          description: "Calcul moyenne",
+        },
+      ],
+      successMessage: "Analyse filtrée réussie !",
+      hints: {
+        baseline: "[duree for duree in minutes if condition] crée une nouvelle liste filtrée.",
+        remedial: "N'oublie pas de diviser par len(longues_sessions) pour la moyenne.",
+        advanced: "Trie la liste filtrée par ordre décroissant avec sorted(..., reverse=True).",
+      },
+      reflection: "Quelles données voudrais-tu filtrer automatiquement (temps, points, tâches...) ?",
+    },
+    quiz: {
+      id: "module-7-quiz",
+      title: "Quiz éclair : itérations express",
+      questions: [
+        {
+          id: "m7q1",
+          prompt: "Quel mot-clé te donne à la fois l'index et la valeur dans une boucle ?",
+          options: ["enumerate", "index", "count"],
+          answerIndex: 0,
+          explanation: "enumerate renvoie des paires (index, valeur).",
+        },
+        {
+          id: "m7q2",
+          prompt: "Quel sera le résultat de [x*2 for x in [1, 2, 3]] ?",
+          options: ["[1, 2, 3]", "[2, 4, 6]", "[1, 4, 9]"],
+          answerIndex: 1,
+          explanation: "Chaque élément est multiplié par 2.",
+        },
+        {
+          id: "m7q3",
+          prompt: "zip([1, 2], ['a', 'b']) produit :",
+          options: ["[(1, 'a'), (2, 'b')]", "[(1, 'a'), (1, 'b')]", "[('a', 1), ('b', 2)]"],
+          answerIndex: 0,
+          explanation: "zip assemble les éléments correspondants des deux listes.",
+        },
+      ],
+    },
+    bonus: {
+      title: "Bonus : statistiques express",
+      description:
+        "Combine zip() et les compréhensions pour calculer des moyennes pondérées (notes et coefficients).",
+      resources: [
+        {
+          label: "Compréhensions de liste",
+          url: "https://docs.python.org/fr/3/tutorial/datastructures.html#list-comprehensions",
+        },
+      ],
+    },
+  },
+  {
+    id: "module-8",
+    title: "Fonctions et modularité",
+    duration: "65 min",
+    objective:
+      "Créer, documenter et réutiliser des fonctions avec paramètres optionnels pour structurer ton code.",
+    motivation:
+      "Tu vas fabriquer ta propre boîte à outils : des fonctions bien nommées pour résoudre chaque problème rapidement.",
+    concept: {
+      title: "Construire ses outils",
+      body: [
+        "def nom_de_fonction(parametre): permet de définir une fonction.",
+        "return renvoie un résultat réutilisable ailleurs dans ton programme.",
+        "Les paramètres optionnels (param=valeur) donnent une valeur par défaut.",
+      ],
+      analogies: [
+        "Une fonction est une recette que tu peux suivre à volonté.",
+        "Les paramètres optionnels sont comme des ingrédients que tu peux laisser à zéro si tu n'en as pas besoin.",
+      ],
+      highlights: [
+        "Ajoute une docstring triple quotes pour décrire l'objectif de la fonction.",
+        "Tu peux renvoyer plusieurs valeurs sous forme de tuple ou de dictionnaire.",
+      ],
+    },
+    demonstration: {
+      code: 'def encourager(nom, objectif="apprendre Python"):\n    """Retourne un message personnalisé."""\n    return f"{nom}, continue vers {objectif}!"\n\nprint(encourager("Aya"))\nprint(encourager("Sam", "ton mini-projet"))',
+      explanation: [
+        "objectif a une valeur par défaut qui peut être remplacée.",
+        "La docstring explique ce que fait la fonction : pratique pour les lecteurs et les outils.",
+      ],
+      callToAction: "Ajoute un paramètre bonus pour préciser le temps restant et affiche-le dans la phrase.",
+    },
+    exercise: {
+      id: "module-8-exo",
+      title: "Chronomètre motivant",
+      instructions:
+        "Écris une fonction resume_session(nom, minutes, pause=5) qui renvoie un message comme 'Lina a pratiqué 40 minutes. Pause recommandée : 5 min'.",
+      starterCode:
+        "def resume_session(nom, minutes, pause=5):\n    message = f'{nom} a pratiqué {minutes} minutes. Pause recommandée : {pause} min\"\n    return message\n\nresultat = resume_session('Lina', 40)\nprint(resultat)\n",
+      tests: [
+        {
+          code: "assert resume_session('Lina', 40) == 'Lina a pratiqué 40 minutes. Pause recommandée : 5 min', 'Utilise la valeur par défaut de pause.'",
+          description: "Valeur par défaut",
+        },
+        {
+          code: "assert '10' in resume_session('Noa', 30, pause=10), 'Autorise la personnalisation de la pause.'",
+          description: "Paramètre optionnel",
+        },
+        {
+          code: "assert 'pratiqué' in resume_session('Aya', 25), 'Formule un message complet.'",
+          description: "Message complet",
+        },
+      ],
+      successMessage: "Super ! Tes fonctions encouragent les apprenants.",
+      hints: {
+        baseline: "Déclare la fonction avec pause=5 dans la signature.",
+        remedial: "return message termine la fonction en renvoyant le texte.",
+        advanced: "Ajoute un paramètre emoji='💪' pour personnaliser encore plus.",
+      },
+    },
+    challenge: {
+      id: "module-8-defi",
+      title: "Plan d'entraînement modulaire",
+      instructions:
+        "Crée une fonction planifier(session, intensite='modérée') qui renvoie un dictionnaire avec les clés 'session', 'intensite', 'message'. Utilise une fonction auxiliaire generer_message(intensite) pour produire le texte.",
+      starterCode:
+        "def generer_message(intensite):\n    if intensite == 'douce':\n        return 'On avance pas à pas.'\n    elif intensite == 'intense':\n        return 'Prêt pour un défi costaud !'\n    return 'Rythme équilibré et durable.'\n\ndef planifier(session, intensite='modérée'):\n    return {\n        'session': session,\n        'intensite': intensite,\n        'message': generer_message(intensite)\n    }\n\nprogramme = planifier('Boucles et conditions')\nprint(programme)\n",
+      tests: [
+        {
+          code: "assert isinstance(planifier('Test'), dict), 'Retourne un dictionnaire.'",
+          description: "Structure attendue",
+        },
+        {
+          code: "assert planifier('Test')['message'] == 'Rythme équilibré et durable.', 'Utilise generer_message pour la valeur par défaut.'",
+          description: "Message par défaut",
+        },
+        {
+          code: "assert planifier('Sprint', 'intense')['message'] == 'Prêt pour un défi costaud !', 'Gère le cas intense.'",
+          description: "Cas intense",
+        },
+      ],
+      successMessage: "Plan personnalisé validé !",
+      hints: {
+        baseline: "Appelle generer_message à l'intérieur de planifier.",
+        remedial: "Retourne un dictionnaire avec les trois clés demandées.",
+        advanced: "Ajoute un champ 'duree_estimee' calculé selon l'intensité.",
+      },
+      reflection: "Quelle fonction pourrais-tu créer pour automatiser un aspect de ton quotidien (planning, sport, finances...) ?",
+    },
+    quiz: {
+      id: "module-8-quiz",
+      title: "Quiz éclair : structurer son code",
+      questions: [
+        {
+          id: "m8q1",
+          prompt: "Quel mot-clé termine immédiatement une fonction en renvoyant une valeur ?",
+          options: ["yield", "return", "break"],
+          answerIndex: 1,
+          explanation: "return quitte la fonction et transmet une valeur.",
+        },
+        {
+          id: "m8q2",
+          prompt: "Comment définir un paramètre optionnel ?",
+          options: ["def f(x optional)", "def f(x=valeur)", "def f(optional x)"],
+          answerIndex: 1,
+          explanation: "On assigne une valeur par défaut directement dans la signature.",
+        },
+        {
+          id: "m8q3",
+          prompt: "À quoi sert une docstring ?",
+          options: ["À exécuter la fonction", "À documenter son comportement", "À accélérer le programme"],
+          answerIndex: 1,
+          explanation: "La docstring décrit la fonction pour les humains et les outils.",
+        },
+      ],
+    },
+    bonus: {
+      title: "Bonus : fonctions pures",
+      description:
+        "Explore les fonctions lambda et les annotations de type pour rendre ton code encore plus explicite.",
+      resources: [
+        {
+          label: "Guide : fonctions", 
           url: "https://docs.python.org/fr/3/tutorial/controlflow.html#defining-functions",
         },
       ],
     },
   },
   {
-    id: "module-6",
-    title: "Mini-projet : calculatrice bienveillante",
-    duration: "90 min",
-    objective: "Assembler toutes les notions apprises pour construire un mini-projet complet.",
+    id: "module-9",
+    title: "Bibliothèques standard et hasard contrôlé",
+    duration: "60 min",
+    objective:
+      "Importer des modules Python (math, random, statistics) pour enrichir tes programmes.",
     motivation:
-      "Tu vas créer une calculatrice qui explique ses étapes. C'est ton premier outil complet, prêt à rendre service !",
+      "Tu vas t'appuyer sur la bibliothèque standard pour aller plus vite : comme utiliser des super-pouvoirs déjà prêts.",
     concept: {
-      title: "Plan d'action",
+      title: "S'appuyer sur les modules",
       body: [
-        "Un mini-projet est un ensemble de fonctions reliées qui répondent à un besoin concret.",
-        "On combine variables, conditions, boucles et fonctions pour orchestrer la logique.",
-        "Le feedback à l'utilisateur est essentiel : explique chaque étape clairement.",
+        "import math donne accès à des fonctions comme sqrt ou ceil.",
+        "random.seed(x) permet de rendre les tirages aléatoires reproductibles.",
+        "statistics.mean calcule rapidement des moyennes.",
       ],
       analogies: [
-        "Construire ce projet, c'est assembler un meuble : chaque module appris est une pièce qui s'emboîte.",
-        "Ta calculatrice sera comme un coach qui explique ses calculs ligne par ligne.",
+        "Importer un module, c'est inviter un expert à rejoindre ton équipe.",
+        "random.seed est comme fixer la position de départ d'une roulette pour comparer les résultats.",
       ],
       highlights: [
-        "Découpe ton code en fonctions courtes et lisibles.",
-        "Prévoyez des messages d'erreur pour guider l'utilisateur en cas d'opération inconnue.",
+        "On peut renommer un module : import statistics as stats.",
+        "from random import choice importe uniquement la fonction choice.",
       ],
     },
     demonstration: {
-      code: 'def addition(a, b):\n    return a + b\n\nprint("2 + 5 =", addition(2, 5))',
+      code: 'import math\nimport random\n\nrandom.seed(0)\nrayon = 3\naire = math.pi * rayon ** 2\nprint("Aire du cercle :", round(aire, 2))\nprint("Échantillon surprise :", random.randint(1, 10))',
       explanation: [
-        "On sépare déjà une opération dans une fonction dédiée.",
-        "La démonstration montre comment réutiliser cette fonction.",
+        "math.pi fournit la constante π.",
+        "random.seed(0) garantit que randint renvoie toujours la même valeur lors des tests.",
       ],
-      callToAction: "Tu vas maintenant compléter toute la calculatrice en suivant les étapes.",
+      callToAction: "Change le rayon ou le seed pour observer l'impact sur les résultats.",
     },
     exercise: {
-      id: "module-6-exo",
-      title: "Catalogue d'opérations",
+      id: "module-9-exo",
+      title: "Calculateur de cercle",
       instructions:
-        "Crée quatre fonctions : addition(a, b), soustraction(a, b), multiplication(a, b), division(a, b) qui renvoient chacune le résultat.",
+        "Écris une fonction surface_et_perimetre(rayon) qui utilise math.pi pour renvoyer un tuple (surface, perimetre) arrondi à 2 décimales.",
       starterCode:
-        "def addition(a, b):\n    return a + b\n\ndef soustraction(a, b):\n    return a - b\n\ndef multiplication(a, b):\n    return a * b\n\ndef division(a, b):\n    if b == 0:\n        return 'Division impossible'\n    return a / b\n",
+        "import math\n\ndef surface_et_perimetre(rayon):\n    surface = round(math.pi * rayon ** 2, 2)\n    perimetre = round(2 * math.pi * rayon, 2)\n    return surface, perimetre\n\nprint(surface_et_perimetre(2))\n",
       tests: [
         {
-          code: "assert addition(3, 4) == 7 and soustraction(5, 2) == 3, 'Addition et soustraction doivent être correctes.'",
-          description: "Somme et différence",
+          code: "assert surface_et_perimetre(2) == (12.57, 12.57), 'Vérifie la formule du cercle.'",
+          description: "Résultat correct",
         },
         {
-          code: "assert multiplication(3, 3) == 9, 'Multiplication incorrecte.'",
-          description: "Produit",
+          code: "assert isinstance(surface_et_perimetre(2), tuple), 'Retourne bien un tuple.'",
+          description: "Type de retour",
         },
         {
-          code: "assert division(10, 0) == 'Division impossible', 'Gère la division par zéro.'",
-          description: "Sécurité division",
+          code: "s, p = surface_et_perimetre(3)\nassert s > p / 2, 'La surface doit être cohérente avec le périmètre.'",
+          description: "Cohérence",
         },
       ],
-      successMessage: "Tes opérations de base sont prêtes !",
+      successMessage: "Géométrie maîtrisée !",
       hints: {
-        baseline: "Chaque fonction doit utiliser return pour envoyer le résultat.",
-        remedial: "Addition : return a + b. Division : vérifie d'abord si b vaut 0.",
-        advanced: "Ajoute une fonction puissance(a, b) pour relever le défi.",
+        baseline: "math.pi contient la valeur de π.",
+        remedial: "Renvoie surface, perimetre dans cet ordre.",
+        advanced: "Ajoute une troisième valeur : le diamètre (2 * rayon).",
       },
     },
     challenge: {
-      id: "module-6-defi",
-      title: "Calculatrice coach",
+      id: "module-9-defi",
+      title: "Générateur d'exercices",
       instructions:
-        "Écris une fonction calculatrice(operation, a, b) qui utilise les fonctions précédentes et renvoie un message clair comme 'Résultat : 4 + 2 = 6'. Si l'opération n'existe pas, renvoie 'Opération inconnue'.",
+        "Utilise random.seed(42) puis crée une fonction exercice_aleatoire() qui renvoie une question parmi trois modèles (addition, multiplication, comparaison) et la réponse attendue.",
       starterCode:
-        'def calculatrice(operation, a, b):\n    if operation == "addition":\n        resultat = addition(a, b)\n        return f"Résultat : {a} + {b} = {resultat}"\n    elif operation == "soustraction":\n        resultat = soustraction(a, b)\n        return f"Résultat : {a} - {b} = {resultat}"\n    elif operation == "multiplication":\n        resultat = multiplication(a, b)\n        return f"Résultat : {a} x {b} = {resultat}"\n    elif operation == "division":\n        resultat = division(a, b)\n        return f"Résultat : {a} ÷ {b} = {resultat}"\n    else:\n        return "Opération inconnue"\n\nprint(calculatrice("addition", 4, 2))\nprint(calculatrice("division", 9, 0))\n',
+        "import random\n\nrandom.seed(42)\nMODELES = [\n    ('addition', lambda: ('Calcule 3 + 7', 3 + 7)),\n    ('multiplication', lambda: ('Calcule 4 * 6', 4 * 6)),\n    ('comparaison', lambda: ('Quel nombre est le plus grand entre 8 et 5 ?', max(8, 5)))\n]\n\ndef exercice_aleatoire():\n    nom, constructeur = random.choice(MODELES)\n    question, reponse = constructeur()\n    return {'type': nom, 'question': question, 'reponse': reponse}\n\nprint(exercice_aleatoire())\n",
       tests: [
         {
-          code: "assert '6' in calculatrice('addition', 4, 2), 'Addition 4 + 2 devrait afficher 6.'",
-          description: "Vérifier addition",
+          code: "resultat = exercice_aleatoire()\nassert set(resultat.keys()) == {'type', 'question', 'reponse'}, 'Retourne un dictionnaire complet.'",
+          description: "Structure",
         },
         {
-          code: "assert 'Opération inconnue' == calculatrice('modulo', 4, 2), 'Prévois un message pour les opérations non supportées.'",
-          description: "Cas inconnu",
+          code: "random.seed(42)\nresultat = exercice_aleatoire()\nassert resultat['type'] == 'multiplication', 'Avec seed(42), le premier tirage doit être une multiplication.'",
+          description: "Seed reproductible",
         },
         {
-          code: "assert 'Division impossible' in calculatrice('division', 9, 0), 'Réutilise la protection de ta fonction division.'",
-          description: "Gestion division",
+          code: "assert isinstance(resultat['reponse'], int), 'Chaque réponse doit être un nombre.'",
+          description: "Type de réponse",
         },
       ],
-      successMessage: "Bravo ! Tu as assemblé ta première calculatrice intelligente.",
+      successMessage: "Tes exercices automatiques sont prêts !",
       hints: {
-        baseline: "Utilise elif pour tester chaque opération.",
-        remedial: "Retourne immédiatement le message correspondant à l'opération trouvée.",
-        advanced: "Ajoute une boucle pour demander une nouvelle opération tant que l'utilisateur ne tape pas 'stop'.",
+        baseline: "random.choice sélectionne un élément de la liste.",
+        remedial: "Retourne un dictionnaire avec les trois clés demandées.",
+        advanced: "Ajoute un paramètre pour modifier le seed en fonction du jour.",
       },
-      reflection: "Quelles autres fonctionnalités pourrais-tu ajouter (historique des opérations, conversion de devises...) ?",
+      reflection: "Quel autre module aimerais-tu explorer (datetime, pathlib, json...) pour enrichir ton projet ?",
     },
     quiz: {
-      id: "module-6-quiz",
-      title: "Quiz éclair : projet complet",
+      id: "module-9-quiz",
+      title: "Quiz éclair : bibliothèque standard",
       questions: [
         {
-          id: "m6q1",
-          prompt: "Pourquoi découper ton projet en fonctions ?",
-          options: [
-            "Pour écrire moins de lignes",
-            "Pour organiser le code, le tester facilement et le réutiliser",
-            "Pour que Python s'exécute plus vite",
-          ],
+          id: "m9q1",
+          prompt: "Quelle instruction importe seulement la fonction sqrt depuis math ?",
+          options: ["import math.sqrt", "from math import sqrt", "math = import sqrt"],
           answerIndex: 1,
-          explanation: "Les fonctions rendent le code clair et réutilisable.",
+          explanation: "from math import sqrt charge uniquement sqrt.",
         },
         {
-          id: "m6q2",
-          prompt: "Que faire si l'utilisateur demande une opération inconnue ?",
-          options: ["Arrêter le programme", "Renvoyer un message explicite", "Ignorer la demande"],
+          id: "m9q2",
+          prompt: "À quoi sert random.seed(10) ?",
+          options: ["À accélérer random", "À rendre les tirages reproductibles", "À supprimer le hasard"],
           answerIndex: 1,
-          explanation: "Informer l'utilisateur évite la frustration et rend l'outil fiable.",
+          explanation: "Le seed fixe le point de départ des tirages aléatoires.",
         },
         {
-          id: "m6q3",
-          prompt: "Quel est l'intérêt de renvoyer des messages détaillés dans la calculatrice ?",
-          options: ["Ajouter de la couleur", "Donner du contexte et apprendre en même temps", "Allonger le code"],
-          answerIndex: 1,
-          explanation: "Expliquer chaque étape aide l'utilisateur à apprendre en lisant le résultat.",
+          id: "m9q3",
+          prompt: "statistics.mean([2, 4, 6]) renvoie :",
+          options: ["4", "6", "3"],
+          answerIndex: 0,
+          explanation: "La moyenne de 2,4,6 vaut 4.",
         },
       ],
     },
     bonus: {
-      title: "Bonus : interface utilisateur",
+      title: "Bonus : JSON et API",
       description:
-        "Transforme la calculatrice en mini-chatbot en demandant les valeurs avec input() et en affichant les résultats progressivement.",
+        "Découvre le module json pour lire/écrire des données structurées et prépare-toi à consommer des API.",
       resources: [
         {
-          label: "Guide : boucle while pour répéter une action",
-          url: "https://docs.python.org/fr/3/tutorial/controlflow.html#while",
+          label: "Documentation : bibliothèque standard",
+          url: "https://docs.python.org/fr/3/library/index.html",
+        },
+      ],
+    },
+  },
+  {
+    id: "module-10",
+    title: "Fichiers et gestion d'erreurs",
+    duration: "70 min",
+    objective:
+      "Lire et écrire des fichiers texte tout en anticipant les erreurs avec try/except.",
+    motivation:
+      "Tu vas apprendre à garder une trace persistante de tes progrès et à protéger ton programme des imprévus.",
+    concept: {
+      title: "Persistance et robustesse",
+      body: [
+        "open('fichier.txt', 'w') crée ou écrase un fichier pour écrire.",
+        "with garantit la fermeture automatique du fichier.",
+        "try/except capture une erreur et évite que le programme ne s'arrête brutalement.",
+      ],
+      analogies: [
+        "Un fichier est un carnet que tu remplis ligne après ligne.",
+        "try/except est un filet de sécurité : il attrape les chutes.",
+      ],
+      highlights: [
+        "Utilise 'a' pour ajouter à la fin du fichier sans écraser.",
+        "except ValueError cible uniquement l'erreur de conversion.",
+      ],
+    },
+    demonstration: {
+      code: "with open('journal.txt', 'w', encoding='utf-8') as fichier:\n    fichier.write('Jour 1 : Découverte de Python\\n')\n\ntry:\n    nombre = int('42')\n    print('Conversion réussie :', nombre)\nexcept ValueError:\n    print('Impossible de convertir.')",
+      explanation: [
+        "Le bloc with écrit une ligne dans journal.txt.",
+        "Le try/except évite l'erreur si la conversion échoue.",
+      ],
+      callToAction: "Ajoute une deuxième ligne au fichier puis teste ce qui se passe si tu convertis 'quarante-deux'.",
+    },
+    exercise: {
+      id: "module-10-exo",
+      title: "Journal de progression",
+      instructions:
+        "Écris une fonction enregistrer_progression(message) qui ouvre le fichier 'journal_progression.txt' en mode append et ajoute le message suivi d'un saut de ligne. Retourne le nombre de caractères écrits.",
+      starterCode:
+        "def enregistrer_progression(message):\n    with open('journal_progression.txt', 'a', encoding='utf-8') as fichier:\n        retour = fichier.write(message + '\\n')\n    return retour\n\nprint(enregistrer_progression('Jour 1 : variables'))\n",
+      tests: [
+        {
+          code: "import os\nif os.path.exists('journal_progression.txt'):\n    os.remove('journal_progression.txt')\nnb = enregistrer_progression('Test 1')\nwith open('journal_progression.txt', 'r', encoding='utf-8') as f:\n    contenu = f.read()\nassert 'Test 1' in contenu, 'Écris le message dans le fichier.'",
+          description: "Écriture du fichier",
+        },
+        {
+          code: "nb = enregistrer_progression('Test 2')\nassert nb == len('Test 2') + 1, 'Retourne le nombre de caractères écrits (avec le saut de ligne).",
+          description: "Retour valeur",
+        },
+      ],
+      successMessage: "Journal sauvegardé !",
+      hints: {
+        baseline: "Ouvre le fichier en mode 'a' pour ajouter sans effacer.",
+        remedial: "write() renvoie le nombre de caractères écrits : stocke ce retour.",
+        advanced: "Ajoute un timestamp automatique avec datetime.now().",
+      },
+    },
+    challenge: {
+      id: "module-10-defi",
+      title: "Nettoyeur de données",
+      instructions:
+        "Tu reçois une liste valeurs = ['12', '9', 'abc', '25']. Crée une fonction filtrer_nombres(valeurs) qui retourne une liste d'entiers convertis et ignore les valeurs non numériques en affichant un message d'erreur pédagogique.",
+      starterCode:
+        "valeurs = ['12', '9', 'abc', '25']\n\ndef filtrer_nombres(valeurs):\n    nombres = []\n    for element in valeurs:\n        try:\n            nombres.append(int(element))\n        except ValueError:\n            print(f\"Impossible de convertir {element}, on continue.\")\n    return nombres\n\nresultat = filtrer_nombres(valeurs)\nprint('Nombres convertis :', resultat)\n",
+      tests: [
+        {
+          code: "assert filtrer_nombres(['1', '2', 'trois']) == [1, 2], 'Ne conserve que les valeurs numériques.'",
+          description: "Filtrage",
+        },
+        {
+          code: "filtrer_nombres(['abc'])\nassert 'Impossible de convertir abc' in __captured_output__, 'Affiche un message pédagogique.'",
+          description: "Message d'erreur",
+        },
+      ],
+      successMessage: "Tes données sont propres et ton programme résiste aux erreurs !",
+      hints: {
+        baseline: "Place int(element) dans le bloc try.",
+        remedial: "Dans except ValueError, affiche un message clair et continue.",
+        advanced: "Ajoute un compteur des erreurs rencontrées.",
+      },
+      reflection: "Quel fichier aimerais-tu commencer à consigner (idées, progrès, finances...) ?",
+    },
+    quiz: {
+      id: "module-10-quiz",
+      title: "Quiz éclair : fichiers et exceptions",
+      questions: [
+        {
+          id: "m10q1",
+          prompt: "Quel mode d'ouverture ajoute du contenu en fin de fichier ?",
+          options: ["'w'", "'a'", "'r'"],
+          answerIndex: 1,
+          explanation: "Le mode 'a' ajoute à la fin sans effacer le contenu existant.",
+        },
+        {
+          id: "m10q2",
+          prompt: "Que fait le bloc with open(...) as f ?",
+          options: ["Il ferme automatiquement le fichier", "Il accélère le programme", "Il renomme le fichier"],
+          answerIndex: 0,
+          explanation: "with gère automatiquement l'ouverture et la fermeture.",
+        },
+        {
+          id: "m10q3",
+          prompt: "Quelle exception est levée lors d'une conversion int('abc') ?",
+          options: ["TypeError", "ValueError", "IndexError"],
+          answerIndex: 1,
+          explanation: "int('abc') provoque une ValueError.",
+        },
+      ],
+    },
+    bonus: {
+      title: "Bonus : fichiers JSON",
+      description:
+        "Apprends à utiliser json.dump et json.load pour stocker des données structurées dans un fichier.",
+      resources: [
+        {
+          label: "Guide : gestion des fichiers",
+          url: "https://docs.python.org/fr/3/tutorial/inputoutput.html",
+        },
+      ],
+    },
+  },
+  {
+    id: "module-11",
+    title: "Programmation orientée objet",
+    duration: "75 min",
+    objective:
+      "Créer des classes, des objets et des méthodes pour structurer des projets plus ambitieux.",
+    motivation:
+      "Tu vas modéliser des concepts du monde réel : parfait pour gérer des collections d'exercices ou des joueurs dans un jeu.",
+    concept: {
+      title: "Dessiner ses propres objets",
+      body: [
+        "class NomDeClasse: définit un nouveau type d'objet.",
+        "__init__ initialise les attributs de l'objet.",
+        "Une méthode est une fonction définie dans la classe (self représente l'objet courant).",
+      ],
+      analogies: [
+        "Une classe est un plan d'architecte, chaque objet est une maison construite avec ce plan.",
+        "self est comme 'moi-même' : l'objet qui parle.",
+      ],
+      highlights: [
+        "Crée des méthodes qui retournent des informations utiles (to_dict, resume...).",
+        "Tu peux hériter d'une classe existante pour la spécialiser.",
+      ],
+    },
+    demonstration: {
+      code: "class ModuleApprentissage:\n    def __init__(self, titre, duree):\n        self.titre = titre\n        self.duree = duree\n        self.acquis = []\n\n    def ajouter_acquis(self, item):\n        self.acquis.append(item)\n\n    def resume(self):\n        return f\"{self.titre} ({self.duree}) - {len(self.acquis)} compétences clés\"\n\nmodule = ModuleApprentissage('Boucles', '1h')\nmodule.ajouter_acquis('for')\nmodule.ajouter_acquis('while')\nprint(module.resume())\n",
+      explanation: [
+        "Chaque objet ModuleApprentissage possède son propre titre, durée et liste d'acquis.",
+        "La méthode resume construit une phrase personnalisée.",
+      ],
+      callToAction: "Ajoute une méthode pour calculer le temps restant si tu prévois 5 heures de pratique.",
+    },
+    exercise: {
+      id: "module-11-exo",
+      title: "Classe Habitude",
+      instructions:
+        "Crée une classe Habitude avec les attributs nom, frequence (par semaine) et progression (par défaut 0). Ajoute une méthode enregistrer(minutes) qui augmente progression et une méthode rapport() qui renvoie un résumé textuel.",
+      starterCode:
+        "class Habitude:\n    def __init__(self, nom, frequence):\n        self.nom = nom\n        self.frequence = frequence\n        self.progression = 0\n\n    def enregistrer(self, minutes):\n        self.progression += minutes\n\n    def rapport(self):\n        return f\"{self.nom} - {self.progression} minutes cumulées (objectif {self.frequence}x/sem)\"\n\npython = Habitude('Python', 3)\npython.enregistrer(45)\nprint(python.rapport())\n",
+      tests: [
+        {
+          code: "python = Habitude('Python', 3)\npython.enregistrer(30)\npython.enregistrer(15)\nassert python.progression == 45, 'Additionne correctement les minutes.'",
+          description: "Accumulation",
+        },
+        {
+          code: "python = Habitude('Python', 2)\nassert 'objectif 2x/sem' in python.rapport(), 'Le résumé doit afficher la fréquence.'",
+          description: "Résumé",
+        },
+      ],
+      successMessage: "Tes habitudes sont prêtes à être suivies !",
+      hints: {
+        baseline: "Initialise progression à 0 dans __init__.",
+        remedial: "Dans enregistrer, utilise += pour cumuler les minutes.",
+        advanced: "Ajoute une méthode objectif_atteint() qui renvoie True quand progression >= frequence * 30.",
+      },
+    },
+    challenge: {
+      id: "module-11-defi",
+      title: "Carnet de modules",
+      instructions:
+        "Crée une classe Parcours qui contient une liste de modules (instances de Habitude ou dictionnaires simples). Ajoute les méthodes ajouter_module(module) et progression_totale() qui additionne les progressions de chaque module.",
+      starterCode:
+        "class Parcours:\n    def __init__(self):\n        self.modules = []\n\n    def ajouter_module(self, module):\n        self.modules.append(module)\n\n    def progression_totale(self):\n        total = 0\n        for module in self.modules:\n            if hasattr(module, 'progression'):\n                total += module.progression\n            elif isinstance(module, dict) and 'progression' in module:\n                total += module['progression']\n        return total\n\nparcours = Parcours()\nparcours.ajouter_module(Habitude('Python', 3))\nparcours.ajouter_module({'nom': 'Projet', 'progression': 120})\nprint('Total :', parcours.progression_totale())\n",
+      tests: [
+        {
+          code: "parcours = Parcours()\nparcours.ajouter_module(Habitude('Python', 3))\nparcours.modules[0].enregistrer(60)\nassert parcours.progression_totale() == 60, 'Additionne la progression des objets.'",
+          description: "Total objets",
+        },
+        {
+          code: "parcours = Parcours()\nparcours.ajouter_module({'nom': 'Révisions', 'progression': 90})\nassert parcours.progression_totale() == 90, 'Accepte aussi les dictionnaires.'",
+          description: "Total dictionnaires",
+        },
+      ],
+      successMessage: "Ton carnet de modules suit tout le monde !",
+      hints: {
+        baseline: "Vérifie le type de module avant d'ajouter sa progression.",
+        remedial: "hasattr(module, 'progression') détecte les objets avec attribut.",
+        advanced: "Ajoute une méthode modules_en_retard() pour trouver ceux en dessous de leur objectif.",
+      },
+      reflection: "Que pourrais-tu modéliser d'autre avec des classes (bibliothèque, finances, jeux...) ?",
+    },
+    quiz: {
+      id: "module-11-quiz",
+      title: "Quiz éclair : classes et objets",
+      questions: [
+        {
+          id: "m11q1",
+          prompt: "Quel mot-clé crée une nouvelle classe ?",
+          options: ["object", "class", "def"],
+          answerIndex: 1,
+          explanation: "class démarre la définition d'une classe.",
+        },
+        {
+          id: "m11q2",
+          prompt: "Quel est le rôle de self dans une méthode ?",
+          options: ["Référencer l'objet courant", "Importer un module", "Créer une variable globale"],
+          answerIndex: 0,
+          explanation: "self représente l'instance en cours d'utilisation.",
+        },
+        {
+          id: "m11q3",
+          prompt: "Comment appeler la méthode rapport d'une instance python ?",
+          options: ["Habitude.rapport()", "python.rapport()", "rapport.python()"],
+          answerIndex: 1,
+          explanation: "On appelle la méthode sur l'objet : python.rapport().",
+        },
+      ],
+    },
+    bonus: {
+      title: "Bonus : héritage",
+      description:
+        "Crée une classe HabitudeSportive qui hérite de Habitude et ajoute une méthode calories_brulees().",
+      resources: [
+        {
+          label: "Tutoriel : classes",
+          url: "https://docs.python.org/fr/3/tutorial/classes.html",
+        },
+      ],
+    },
+  },
+  {
+    id: "module-12",
+    title: "Projet final : Assistant Python complet",
+    duration: "90 min",
+    objective:
+      "Assembler toutes les compétences pour livrer un coach d'apprentissage clé en main.",
+    motivation:
+      "C'est le grand final : tu vas orchestrer fonctions, boucles, collections, fichiers et objets dans un mini-projet concret.",
+    concept: {
+      title: "Orchestrer l'ensemble",
+      body: [
+        "Planifie tes données (listes, dictionnaires, classes) avant de coder.",
+        "Découpe ton projet en fonctions testables pour chaque fonctionnalité.",
+        "Prépare un point d'entrée lancer_projet() qui rassemble tout et renvoie un résultat clair.",
+      ],
+      analogies: [
+        "Composer un projet, c'est diriger un orchestre : chaque instrument (fonction) joue sa partition.",
+        "Le point d'entrée est la scène finale où tout le monde se retrouve.",
+      ],
+      highlights: [
+        "Pense à réutiliser ton code précédent plutôt qu'à tout réécrire.",
+        "Documente les étapes pour guider l'utilisateur final.",
+      ],
+    },
+    demonstration: {
+      code: "import random\n\nrandom.seed(5)\nmodules = ['Variables', 'Boucles', 'Fichiers']\nplan = [f'Session {index+1} : {module}' for index, module in enumerate(modules)]\ndefi = random.choice(['Quiz surprise', 'Mini-jeu', 'Refactorisation'])\nprint('Plan :', plan)\nprint('Défi du jour :', defi)\n",
+      explanation: [
+        "On combine enumerate et compréhension de liste pour construire un plan dynamique.",
+        "random.choice ajoute une touche de surprise au défi final.",
+      ],
+      callToAction: "Ajoute un suivi de points cumulés et un message final qui félicite l'utilisateur.",
+    },
+    exercise: {
+      id: "module-12-exo",
+      title: "Tableau de bord initial",
+      instructions:
+        "Crée une liste modules_journee contenant trois dictionnaires {'nom': ..., 'duree': ..., 'etat': 'à faire'}. Affiche un résumé du temps total (somme des durées) et une liste des titres.",
+      starterCode:
+        "modules_journee = [\n    {'nom': 'Variables essentielles', 'duree': 40, 'etat': 'à faire'},\n    {'nom': 'Boucles dynamiques', 'duree': 50, 'etat': 'à faire'},\n    {'nom': 'Fichiers et erreurs', 'duree': 45, 'etat': 'à faire'}\n]\n\ntemps_total = sum(module['duree'] for module in modules_journee)\ntitres = [module['nom'] for module in modules_journee]\n\nprint('Temps total :', temps_total, 'minutes')\nprint('Au programme :', ', '.join(titres))\n",
+      tests: [
+        {
+          code: "assert isinstance(modules_journee, list) and all(isinstance(item, dict) for item in modules_journee), 'Utilise une liste de dictionnaires.'",
+          description: "Structure correcte",
+        },
+        {
+          code: "assert temps_total == sum(module['duree'] for module in modules_journee), 'Calcule la somme des durées.'",
+          description: "Somme",
+        },
+        {
+          code: "assert ', '.join([module['nom'] for module in modules_journee]) in __captured_output__, 'Affiche la liste des titres.'",
+          description: "Affichage titres",
+        },
+      ],
+      successMessage: "Tableau de bord prêt à être alimenté !",
+      hints: {
+        baseline: "Utilise sum(...) et une compréhension de liste pour les titres.",
+        remedial: "Assure-toi que chaque dictionnaire possède les clés nom, duree, etat.",
+        advanced: "Trie les modules par durée décroissante avant l'affichage.",
+      },
+    },
+    challenge: {
+      id: "module-12-defi",
+      title: "Lancer l'assistant Codex",
+      instructions:
+        "Code une fonction lancer_assistant(nom, modules) qui :\n1) marque le premier module comme 'en cours',\n2) calcule le temps total,\n3) choisit un défi aléatoire reproductible (random.seed(12)),\n4) enregistre un message dans 'journal_progression.txt',\n5) renvoie un dictionnaire avec les clés 'apprenant', 'plan', 'defi', 'message_final'.",
+      starterCode:
+        "import random\n\nrandom.seed(12)\nDEFIS = ['Quiz final', 'Jeu devine le nombre', 'Débogage express']\n\ndef lancer_assistant(nom, modules):\n    modules[0]['etat'] = 'en cours'\n    temps_total = sum(module['duree'] for module in modules)\n    defi = random.choice(DEFIS)\n    message = f'{nom}, tu disposes de {temps_total} minutes pour finaliser ton parcours.'\n    with open('journal_progression.txt', 'a', encoding='utf-8') as fichier:\n        fichier.write(message + '\\n')\n    return {\n        'apprenant': nom,\n        'plan': modules,\n        'defi': defi,\n        'message_final': message\n    }\n\nmodules_test = [\n    {'nom': 'Révisions', 'duree': 30, 'etat': 'à faire'},\n    {'nom': 'Projet final', 'duree': 45, 'etat': 'à faire'}\n]\nresultat = lancer_assistant('Lina', modules_test)\nprint(resultat)\n",
+      tests: [
+        {
+          code: "modules = [\n    {'nom': 'Variables', 'duree': 30, 'etat': 'à faire'},\n    {'nom': 'Boucles', 'duree': 40, 'etat': 'à faire'}\n]\nresultat = lancer_assistant('Noa', modules)\nassert resultat['plan'][0]['etat'] == 'en cours', 'Le premier module doit démarrer immédiatement.'",
+          description: "Mise à jour état",
+        },
+        {
+          code: "modules = [\n    {'nom': 'Variables', 'duree': 30, 'etat': 'à faire'},\n    {'nom': 'Boucles', 'duree': 40, 'etat': 'à faire'}\n]\nresultat = lancer_assistant('Noa', modules)\nassert 'Noa' in resultat['message_final'], 'Message final personnalisé.'",
+          description: "Message personnalisé",
+        },
+        {
+          code: "modules = [\n    {'nom': 'Variables', 'duree': 30, 'etat': 'à faire'},\n    {'nom': 'Boucles', 'duree': 40, 'etat': 'à faire'}\n]\nresultat = lancer_assistant('Noa', modules)\nassert resultat['defi'] in DEFIS, 'Le défi provient de la liste prédéfinie.'",
+          description: "Défi valide",
+        },
+      ],
+      successMessage: "Assistant Codex opérationnel !",
+      hints: {
+        baseline: "Modifie modules[0]['etat'] avant de calculer la somme.",
+        remedial: "N'oublie pas d'écrire le message dans le fichier pour garder une trace.",
+        advanced: "Ajoute un score final calculé en fonction du nombre de modules.",
+      },
+      reflection: "Quelle fonctionnalité ajouterais-tu pour rendre ton assistant encore plus utile (tableau web, notifications...)?",
+    },
+    quiz: {
+      id: "module-12-quiz",
+      title: "Quiz éclair : synthèse finale",
+      questions: [
+        {
+          id: "m12q1",
+          prompt: "Quelle structure te permet de renvoyer plusieurs informations à la fois dans ton projet ?",
+          options: ["Une seule variable", "Un dictionnaire ou une classe", "Un print"],
+          answerIndex: 1,
+          explanation: "Un dictionnaire ou un objet regroupe plusieurs champs nommés.",
+        },
+        {
+          id: "m12q2",
+          prompt: "Pourquoi fixer le seed avant de tirer un défi aléatoire ?",
+          options: ["Pour supprimer le hasard", "Pour obtenir un comportement reproductible", "Pour accélérer random"],
+          answerIndex: 1,
+          explanation: "Le seed garantit que deux exécutions donnent le même résultat lors des tests.",
+        },
+        {
+          id: "m12q3",
+          prompt: "Quel est l'intérêt d'écrire dans un fichier dans le projet final ?",
+          options: ["Aucun", "Garder une trace de la progression", "Remplacer les fonctions"],
+          answerIndex: 1,
+          explanation: "Un fichier journal conserve l'historique des progrès de l'apprenant.",
+        },
+      ],
+    },
+    bonus: {
+      title: "Bonus : partage et extensions",
+      description:
+        "Déploie ton assistant sur le web avec un petit serveur Flask ou FastAPI, ou connecte-le à une interface graphique Streamlit.",
+      resources: [
+        {
+          label: "Aller plus loin avec FastAPI",
+          url: "https://fastapi.tiangolo.com/",
         },
       ],
     },
