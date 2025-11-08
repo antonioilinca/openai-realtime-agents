@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import "./lib/envSetup";
 
 export const metadata: Metadata = {
-  title: "Realtime API Agents",
-  description: "A demo app from OpenAI.",
+  title: "Codex Python Day Camp",
+  description:
+    "Formation immersive en Python pour débutants : apprends les bases, pratique et lance ton mini-projet en une journée.",
 };
 
 export default function RootLayout({
@@ -13,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`antialiased`}>{children}</body>
+    <html lang="fr">
+      <body className="bg-sand-50 text-slate-900 antialiased">{children}</body>
     </html>
   );
 }
