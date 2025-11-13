@@ -227,3 +227,85 @@ Feel free to open an issue or pull request and we'll do our best to review it. T
 - Noah MacCallum - [noahmacca](https://x.com/noahmacca)
 - Ilan Bigio - [ibigio](https://github.com/ibigio)
 - Brian Fioca - [bfioca](https://github.com/bfioca)
+
+---
+
+# Autonomous OSINT Detective
+
+This repository also includes a production-ready, fully local autonomous OSINT (Open-Source Intelligence) pipeline located under `osint_detective/`. The system orchestrates scraping, summarisation, semantic indexing, contradiction detection, and report generation using only free and open-source tooling.
+
+## Architecture Overview
+
+```text
+┌──────────────────────┐
+│ detective.py         │  CLI entry-point
+├──────────────────────┤
+│ scraper.py           │  Async HTML fetch + clean, robots-aware
+│ vector_store.py      │  FAISS store + metadata persistence
+│ summarizer.py        │  Local LLM summarisation (llama.cpp → transformers fallback)
+│ investigator.py      │  Cross-source correlation, contradictions, heuristics
+│ report_generator.py  │  Markdown renderer for structured reports
+│ updater.py           │  APScheduler-based daily refresh hook
+└──────────────────────┘
+```
+
+Support modules include `config.py` (runtime configuration) and `__init__.py` for package exports. Outputs are stored under the top-level `output/` directory, including markdown reports and JSONL run history.
+
+## Installation
+
+```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+> **Model weights**: To enable fully local summarisation, download a compatible GGUF model (e.g., `Llama-3.1-8B-Instruct.Q4_K_M.gguf`) and set `LLAMA_MODEL_PATH` to the file path. Without a local model, the system falls back to the open-source `bart-large-cnn` transformer summariser.
+
+## Running an Investigation
+
+```bash
+python -m osint_detective.detective --query "Nvidia AI dominance" \
+  --sources "https://www.nvidia.com/en-us/data-center/" \
+  "https://www.reuters.com/technology/" "https://www.tomshardware.com/"
+```
+
+The command writes a full report to `output/nvidia-ai-dominance.md`, updates FAISS indexes in `output/vector_store.faiss`, and appends run metadata to `output/runs.jsonl`.
+
+## Extending the System
+
+- **Additional scrapers**: Implement advanced fetchers (e.g., Playwright) and register them in `scraper.py`.
+- **Alternative embeddings**: Adjust `Settings.embedding_model` to any SentenceTransformer-compatible model.
+- **Custom analytics**: Enhance contradiction heuristics or add entity linking inside `investigator.py`.
+- **Scheduling**: Configure the cron expression in `Settings.scheduler_cron` and start `KnowledgeBaseUpdater` to enable unattended updates.
+
+## Daily Auto-Refresh
+
+Embed the following snippet in a long-running process (or separate service) to activate the scheduled updates:
+
+```python
+from osint_detective.config import Settings
+from osint_detective.updater import KnowledgeBaseUpdater
+from osint_detective.detective import run_pipeline
+
+settings = Settings()
+settings.prepare()
+
+async def refresh(urls):
+    await run_pipeline("Nvidia AI dominance", urls, settings)
+
+updater = KnowledgeBaseUpdater(settings, scrape_fn=refresh)
+updater.start()
+```
+
+This initialises a cron-based job (default `0 7 * * *`) that re-scrapes sources, refreshes the vector store, and regenerates the master report.
+
+## Demo Output
+
+A sample execution for `"Nvidia AI dominance"` produces:
+
+- `output/nvidia-ai-dominance.md` — Comprehensive structured report
+- `output/vector_store.faiss` — Semantic index for quick retrieval
+- `output/metadata.json` — Chunk-level metadata, summaries, and provenance
+- `output/runs.jsonl` — Historical log of investigation runs
+
+The architecture is modular, stateless between runs (persisting state only in the vector store), and designed to run entirely on local hardware without any paid APIs.
