@@ -1,0 +1,10 @@
+aiohttp>=3.9.0
+apscheduler>=3.10.4
+beautifulsoup4>=4.12.2
+faiss-cpu>=1.7.4
+llama-cpp-python>=0.2.84
+numpy>=1.26.0
+requests>=2.31.0
+sentence-transformers>=2.2.2
+torch>=2.1.0
+transformers>=4.40.0
