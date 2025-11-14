@@ -1,4 +1,44 @@
-const procedures = [
+export interface ProcedureStep {
+  stepTitle: string;
+  stepDescription: string;
+  requiredDocuments: string[];
+  whereToGo: string;
+  estimatedDelay: string;
+  tips: string;
+}
+
+export interface ProcedureTemplate {
+  title: string;
+  content: string;
+}
+
+export interface ProcedureContacts {
+  officialWebsite: string;
+  phoneNumbers: string[];
+  emailsOrForms: string[];
+  notes?: string;
+}
+
+export interface Procedure {
+  id: string;
+  title: string;
+  subtitle: string;
+  category: string;
+  shortDescription: string;
+  difficulty: string;
+  estimatedDuration: string;
+  mainAuthority: string;
+  summary: string;
+  whoIsConcerned: string[];
+  prerequisites: string[];
+  steps: ProcedureStep[];
+  contacts: ProcedureContacts;
+  commonMistakes: string[];
+  tips: string[];
+  templates: ProcedureTemplate[];
+}
+
+export const procedures: Procedure[] = [
   {
     id: 'naturalisation',
     title: 'Demande de naturalisation française',
@@ -1054,188 +1094,4 @@ Cordialement,
     templates: [],
   },
 ];
-
-const cardsContainer = document.getElementById('cards-container');
-const detailPanel = document.getElementById('detail-panel');
-const searchInput = document.getElementById('search');
-
-function renderCards(list) {
-  if (!list.length) {
-    cardsContainer.innerHTML = `<div class="empty-state">Aucune démarche ne correspond à votre recherche pour le moment.</div>`;
-    return;
-  }
-
-  const html = list
-    .map(
-      (procedure) => `
-        <article class="card" data-id="${procedure.id}">
-          <div class="card-header">
-            <h2>${procedure.title}</h2>
-            <span class="badge">${procedure.category}</span>
-          </div>
-          <p>${procedure.shortDescription}</p>
-          <div class="card-meta">
-            <span>Difficulté : ${procedure.difficulty}</span>
-            <span>Durée : ${procedure.estimatedDuration}</span>
-            <span>Autorité : ${procedure.mainAuthority}</span>
-          </div>
-          <button class="cta" type="button">Voir le parcours</button>
-        </article>
-      `
-    )
-    .join('');
-
-  cardsContainer.innerHTML = html;
-}
-
-function renderDetail(procedure) {
-  if (!procedure) {
-    detailPanel.innerHTML = `
-      <div class="detail-empty">
-        <h2>Sélectionnez une démarche</h2>
-        <p>Choisissez une carte pour afficher un guide détaillé : étapes, documents, contacts, conseils pratiques.</p>
-      </div>
-    `;
-    return;
-  }
-
-  const whoList = procedure.whoIsConcerned.map((item) => `<li>${item}</li>`).join('');
-  const prereqList = procedure.prerequisites.map((item) => `<li>${item}</li>`).join('');
-
-  const steps = procedure.steps
-    .map(
-      (step, index) => `
-        <div class="step">
-          <h4>Étape ${index + 1} – ${step.stepTitle}</h4>
-          <p>${step.stepDescription}</p>
-          <div class="step-meta">
-            <span>Où : ${step.whereToGo}</span>
-            <span>Délai estimé : ${step.estimatedDelay}</span>
-          </div>
-          ${
-            step.requiredDocuments && step.requiredDocuments.length
-              ? `<strong>Documents utiles :</strong><ul>${step.requiredDocuments.map((doc) => `<li>${doc}</li>`).join('')}</ul>`
-              : ''
-          }
-          ${step.tips ? `<p><strong>Astuce :</strong> ${step.tips}</p>` : ''}
-        </div>
-      `
-    )
-    .join('');
-
-  const mistakes = procedure.commonMistakes.map((item) => `<li>${item}</li>`).join('');
-  const tips = procedure.tips.map((item) => `<li>${item}</li>`).join('');
-
-  const templates =
-    procedure.templates && procedure.templates.length
-      ? `
-        <div class="detail-section templates">
-          <h3>Modèles prêts à l’emploi</h3>
-          ${procedure.templates
-            .map(
-              (template) => `
-                <article>
-                  <h4>${template.title}</h4>
-                  <pre>${template.content}</pre>
-                </article>
-              `
-            )
-            .join('')}
-        </div>
-      `
-      : '';
-
-  const contactsPhones = procedure.contacts.phoneNumbers
-    .map((phone) => `<li>${phone}</li>`)
-    .join('');
-  const contactsEmails = procedure.contacts.emailsOrForms
-    .map((item) => `<li>${item}</li>`)
-    .join('');
-
-  detailPanel.innerHTML = `
-    <div class="detail-header">
-      <h2>${procedure.title}</h2>
-      <p>${procedure.subtitle}</p>
-      <div class="detail-tags">
-        <span class="badge">${procedure.category}</span>
-        <span>Difficulté : ${procedure.difficulty}</span>
-        <span>Durée estimée : ${procedure.estimatedDuration}</span>
-        <span>Autorité principale : ${procedure.mainAuthority}</span>
-      </div>
-    </div>
-
-    <div class="detail-section">
-      <h3>En bref</h3>
-      <p>${procedure.summary}</p>
-    </div>
-
-    <div class="detail-section">
-      <h3>Qui est concerné ?</h3>
-      <ul>${whoList}</ul>
-    </div>
-
-    <div class="detail-section">
-      <h3>Pré-requis avant de commencer</h3>
-      <ul>${prereqList}</ul>
-    </div>
-
-    <div class="detail-section">
-      <h3>Étapes détaillées</h3>
-      <div class="steps">${steps}</div>
-    </div>
-
-    <div class="detail-section">
-      <h3>Contacts utiles</h3>
-      <p><strong>Site officiel :</strong> <a href="${procedure.contacts.officialWebsite}" target="_blank" rel="noopener noreferrer">${procedure.contacts.officialWebsite}</a></p>
-      <p><strong>Téléphone :</strong></p>
-      <ul>${contactsPhones}</ul>
-      <p><strong>Emails / formulaires :</strong></p>
-      <ul>${contactsEmails}</ul>
-      ${procedure.contacts.notes ? `<p class="note">${procedure.contacts.notes}</p>` : ''}
-    </div>
-
-    <div class="detail-section">
-      <h3>Erreurs fréquentes à éviter</h3>
-      <ul>${mistakes}</ul>
-    </div>
-
-    <div class="detail-section">
-      <h3>Conseils pratiques</h3>
-      <ul>${tips}</ul>
-    </div>
-    ${templates}
-  `;
-}
-
-function handleCardClick(event) {
-  const card = event.target.closest('.card');
-  if (!card) return;
-
-  const procedureId = card.getAttribute('data-id');
-  const procedure = procedures.find((item) => item.id === procedureId);
-  renderDetail(procedure);
-
-  card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-function handleSearch(event) {
-  const query = event.target.value.trim().toLowerCase();
-  if (!query) {
-    renderCards(procedures);
-    return;
-  }
-
-  const filtered = procedures.filter((procedure) => {
-    const haystack = `${procedure.title} ${procedure.category}`.toLowerCase();
-    return haystack.includes(query);
-  });
-
-  renderCards(filtered);
-}
-
-renderCards(procedures);
-renderDetail(null);
-
-cardsContainer.addEventListener('click', handleCardClick);
-searchInput.addEventListener('input', handleSearch);
 
