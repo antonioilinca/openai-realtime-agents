@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guide IA des Démarches Françaises</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="page-header">
+      <div class="header-text">
+        <h1>Guide IA des Démarches Françaises</h1>
+        <p class="subtitle">Choisissez une démarche administrative et laissez l’IA vous guider étape par étape.</p>
+        <p class="reassurance">Infos structurées, liens officiels, contacts utiles. Pas de jargon inutile.</p>
+      </div>
+      <div class="search-wrapper">
+        <label for="search" class="visually-hidden">Rechercher une démarche</label>
+        <input id="search" type="search" placeholder="Rechercher une démarche (ex : naturalisation, CAF, titre de séjour…)" autocomplete="off" />
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="cards" id="cards-container" aria-live="polite"></section>
+      <aside class="detail" id="detail-panel">
+        <div class="detail-empty">
+          <h2>Bienvenue 👋</h2>
+          <p>Sélectionnez une démarche pour afficher un guide complet avec étapes, documents, conseils et contacts utiles.</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="page-footer">
+      <p>Les informations sont fournies à titre indicatif : vérifiez toujours les dernières mises à jour sur les sites officiels (service-public.fr, préfecture, CAF, etc.).</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
