@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guide IA des Démarches Françaises</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="app-header">
+        <div class="branding">
+          <span class="logo-circle" aria-hidden="true">📄</span>
+          <div>
+            <h1>Guide IA des Démarches Françaises</h1>
+            <p class="subtitle">
+              Choisissez une démarche administrative et laissez l’IA vous guider étape par étape.
+            </p>
+            <p class="reassurance">
+              Infos structurées, liens officiels, contacts utiles. Pas de jargon inutile.
+            </p>
+          </div>
+        </div>
+        <div class="search-wrapper">
+          <label for="search-input" class="sr-only">Rechercher une démarche</label>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Rechercher une démarche (ex : naturalisation, CAF, titre de séjour…)"
+            autocomplete="off"
+          />
+        </div>
+      </header>
+
+      <main class="content-layout">
+        <section class="cards-section">
+          <div class="section-heading">
+            <h2>Parcours disponibles</h2>
+            <p>
+              Parcourez les démarches les plus fréquentes en France. Chaque fiche vous explique les étapes clés,
+              les documents à prévoir et les contacts utiles pour avancer sereinement.
+            </p>
+          </div>
+          <div id="cards-container" class="cards-grid" aria-live="polite"></div>
+          <p id="no-results-message" class="no-results" hidden>
+            Aucune démarche ne correspond à votre recherche pour le moment. Essayez un autre mot-clé ou une autre catégorie.
+          </p>
+        </section>
+
+        <aside id="detail-panel" class="detail-panel" aria-live="polite">
+          <div class="detail-placeholder">
+            <h2>Besoin d’un coup de pouce ?</h2>
+            <p>
+              Sélectionnez une démarche dans la liste pour afficher un guide complet : étapes détaillées, documents à
+              réunir, conseils pratiques et contacts officiels pour avancer sans stress.
+            </p>
+            <p class="placeholder-tip">Astuce : utilisez la recherche pour trouver rapidement votre démarche.</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+
+    <footer class="app-footer">
+      Les informations sont fournies à titre indicatif : vérifiez toujours les dernières mises à jour sur les sites
+      officiels (service-public.fr, préfectures, CAF, etc.).
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
