@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulateur IA des Aides Françaises</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <div class="branding">
+        <h1>Simulateur IA des Aides Françaises</h1>
+        <p class="subtitle">Répondez à quelques questions et découvrez à quelles aides vous pourriez avoir droit.</p>
+        <p class="note">Simulation simplifiée, à titre indicatif. Les résultats ne remplacent pas un calcul officiel.</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <section class="intro">
+      <div class="intro-points">
+        <div class="point">✔ Simple et pédagogique</div>
+        <div class="point">✔ Aucune inscription nécessaire</div>
+        <div class="point">✔ Liens directs vers les sites officiels</div>
+      </div>
+    </section>
+
+    <section class="profile-summary" id="profile-summary">
+      <h2>Profil rapide</h2>
+      <p class="profile-placeholder">Votre profil sera résumé ici au fur et à mesure des réponses.</p>
+      <ul class="profile-details hidden" id="profile-details">
+        <li><span>Âge :</span> <strong data-summary="age">–</strong></li>
+        <li><span>Situation professionnelle :</span> <strong data-summary="situationPro">–</strong></li>
+        <li><span>Situation familiale :</span> <strong data-summary="family">–</strong></li>
+        <li><span>Logement :</span> <strong data-summary="logement">–</strong></li>
+        <li><span>Ressources mensuelles :</span> <strong data-summary="revenus">–</strong></li>
+      </ul>
+      <p class="prefill-message hidden" id="prefill-message">Profil pré-rempli (modifiable).</p>
+    </section>
+
+    <div class="cta">
+      <button id="start-btn" class="primary-btn">Commencer la simulation</button>
+    </div>
+
+    <section class="example-profiles" aria-label="Exemples de profils">
+      <h2>Besoin d'inspiration ?</h2>
+      <div class="example-grid">
+        <article class="example-card" data-example="etudiant">
+          <h3>Étudiant·e de 21 ans</h3>
+          <p>Logement étudiant, revenus limités.</p>
+          <button class="ghost-btn">Charger ce profil</button>
+        </article>
+        <article class="example-card" data-example="salarie">
+          <h3>Salarié·e célibataire de 28 ans</h3>
+          <p>Location en ville, revenus modestes.</p>
+          <button class="ghost-btn">Charger ce profil</button>
+        </article>
+        <article class="example-card" data-example="parent">
+          <h3>Parent isolé avec 1 enfant</h3>
+          <p>Locataire, allocation logement souhaitée.</p>
+          <button class="ghost-btn">Charger ce profil</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="wizard hidden" id="wizard">
+      <div class="wizard-header">
+        <div class="progress-bar">
+          <div class="progress" id="progress"></div>
+        </div>
+        <div class="wizard-meta">
+          <span id="step-counter"></span>
+          <button class="link-btn" id="exit-wizard">Retour à l'accueil</button>
+        </div>
+      </div>
+      <div class="wizard-content" id="wizard-content"></div>
+      <div class="wizard-actions">
+        <button class="secondary-btn" id="prev-btn">Précédent</button>
+        <button class="primary-btn" id="next-btn">Suivant</button>
+      </div>
+    </section>
+
+    <section class="results hidden" id="results"></section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Résultats indicatifs, basés sur des règles simplifiées. Pour une réponse officielle, utilisez les simulateurs des organismes (CAF, service-public.fr, France Travail...).</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
