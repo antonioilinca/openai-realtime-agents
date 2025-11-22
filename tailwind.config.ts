@@ -11,6 +11,12 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        institution: "#003366",
+        gold: "#d4af37",
+        stone: "#f2f2f2",
+      },
+      boxShadow: {
+        soft: "0 20px 40px rgba(0,0,0,0.08)",
       },
     },
   },
