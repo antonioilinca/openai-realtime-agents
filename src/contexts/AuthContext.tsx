@@ -12,9 +12,9 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  User,
   firebaseEnabled,
 } from "@/lib/firebase";
+import type { User } from "@/lib/firebase";
 import toast from "react-hot-toast";
 
 export type AuthContextType = {

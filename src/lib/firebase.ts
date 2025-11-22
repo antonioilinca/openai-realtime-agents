@@ -8,8 +8,8 @@ import {
   signInWithPopup,
   signOut,
   onAuthStateChanged,
-  User,
 } from "firebase/auth";
+import type { User } from "firebase/auth";
 import {
   getFirestore,
   collection,
@@ -88,5 +88,6 @@ export {
   uploadBytes,
   getDownloadURL,
   deleteObject,
-  User,
 };
+
+export type { User };
