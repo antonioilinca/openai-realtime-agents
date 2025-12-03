@@ -1,551 +1,654 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ActivitySquare,
+  AlertTriangle,
+  Brain,
+  Camera,
+  Download,
+  FileAudio,
+  FileImage,
+  FileText,
+  Languages,
+  MapPin,
+  Mic,
+  PhoneCall,
+  Play,
+  Sparkles,
+  Stethoscope,
+  Video,
+  Volume2,
+} from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
+import { geminiService } from "./vitalia/geminiService";
+import {
+  BodyMetrics,
+  InteractionRecord,
+  Language,
+  MedicalAnalysisResponse,
+  OfflineGuide,
+} from "./vitalia/types";
+import { OFFLINE_GUIDES } from "./vitalia/offlineGuides";
 
-import Image from "next/image";
+const languages: { code: Language; label: string }[] = [
+  { code: "en", label: "English" },
+  { code: "fr", label: "Français" },
+  { code: "ro", label: "Română" },
+];
 
-// UI components
-import Transcript from "./components/Transcript";
-import Events from "./components/Events";
-import BottomToolbar from "./components/BottomToolbar";
+const urgencyGradient = [
+  "from-teal-400 to-teal-600",
+  "from-lime-400 to-amber-500",
+  "from-amber-500 to-orange-500",
+  "from-orange-500 to-red-500",
+  "from-red-600 to-red-700",
+];
 
-// Types
-import { SessionStatus } from "@/app/types";
-import type { RealtimeAgent } from '@openai/agents/realtime';
+const glass = "bg-white/70 backdrop-blur-xl shadow-xl border border-white/50";
 
-// Context providers & hooks
-import { useTranscript } from "@/app/contexts/TranscriptContext";
-import { useEvent } from "@/app/contexts/EventContext";
-import { useRealtimeSession } from "./hooks/useRealtimeSession";
-import { createModerationGuardrail } from "@/app/agentConfigs/guardrails";
-
-// Agent configs
-import { allAgentSets, defaultAgentSetKey } from "@/app/agentConfigs";
-import { customerServiceRetailScenario } from "@/app/agentConfigs/customerServiceRetail";
-import { chatSupervisorScenario } from "@/app/agentConfigs/chatSupervisor";
-import { customerServiceRetailCompanyName } from "@/app/agentConfigs/customerServiceRetail";
-import { chatSupervisorCompanyName } from "@/app/agentConfigs/chatSupervisor";
-import { simpleHandoffScenario } from "@/app/agentConfigs/simpleHandoff";
-
-// Map used by connect logic for scenarios defined via the SDK.
-const sdkScenarioMap: Record<string, RealtimeAgent[]> = {
-  simpleHandoff: simpleHandoffScenario,
-  customerServiceRetail: customerServiceRetailScenario,
-  chatSupervisor: chatSupervisorScenario,
+const toBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      if (typeof result === "string") {
+        resolve(result.replace(/^data:[^;]+;base64,/, ""));
+      } else {
+        reject(new Error("Unable to read file"));
+      }
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
 };
 
-import useAudioDownload from "./hooks/useAudioDownload";
-import { useHandleSessionHistory } from "./hooks/useHandleSessionHistory";
-
-function App() {
-  const searchParams = useSearchParams()!;
-
-  // ---------------------------------------------------------------------
-  // Codec selector – lets you toggle between wide-band Opus (48 kHz)
-  // and narrow-band PCMU/PCMA (8 kHz) to hear what the agent sounds like on
-  // a traditional phone line and to validate ASR / VAD behaviour under that
-  // constraint.
-  //
-  // We read the `?codec=` query-param and rely on the `changePeerConnection`
-  // hook (configured in `useRealtimeSession`) to set the preferred codec
-  // before the offer/answer negotiation.
-  // ---------------------------------------------------------------------
-  const urlCodec = searchParams.get("codec") || "opus";
-
-  // Agents SDK doesn't currently support codec selection so it is now forced 
-  // via global codecPatch at module load 
-
-  const {
-    addTranscriptMessage,
-    addTranscriptBreadcrumb,
-  } = useTranscript();
-  const { logClientEvent, logServerEvent } = useEvent();
-
-  const [selectedAgentName, setSelectedAgentName] = useState<string>("");
-  const [selectedAgentConfigSet, setSelectedAgentConfigSet] = useState<
-    RealtimeAgent[] | null
-  >(null);
-
-  const audioElementRef = useRef<HTMLAudioElement | null>(null);
-  // Ref to identify whether the latest agent switch came from an automatic handoff
-  const handoffTriggeredRef = useRef(false);
-
-  const sdkAudioElement = React.useMemo(() => {
-    if (typeof window === 'undefined') return undefined;
-    const el = document.createElement('audio');
-    el.autoplay = true;
-    el.style.display = 'none';
-    document.body.appendChild(el);
-    return el;
-  }, []);
-
-  // Attach SDK audio element once it exists (after first render in browser)
-  useEffect(() => {
-    if (sdkAudioElement && !audioElementRef.current) {
-      audioElementRef.current = sdkAudioElement;
-    }
-  }, [sdkAudioElement]);
-
-  const {
-    connect,
-    disconnect,
-    sendUserText,
-    sendEvent,
-    interrupt,
-    mute,
-  } = useRealtimeSession({
-    onConnectionChange: (s) => setSessionStatus(s as SessionStatus),
-    onAgentHandoff: (agentName: string) => {
-      handoffTriggeredRef.current = true;
-      setSelectedAgentName(agentName);
-    },
-  });
-
-  const [sessionStatus, setSessionStatus] =
-    useState<SessionStatus>("DISCONNECTED");
-
-  const [isEventsPaneExpanded, setIsEventsPaneExpanded] =
-    useState<boolean>(true);
-  const [userText, setUserText] = useState<string>("");
-  const [isPTTActive, setIsPTTActive] = useState<boolean>(false);
-  const [isPTTUserSpeaking, setIsPTTUserSpeaking] = useState<boolean>(false);
-  const [isAudioPlaybackEnabled, setIsAudioPlaybackEnabled] = useState<boolean>(
-    () => {
-      if (typeof window === 'undefined') return true;
-      const stored = localStorage.getItem('audioPlaybackEnabled');
-      return stored ? stored === 'true' : true;
-    },
-  );
-
-  // Initialize the recording hook.
-  const { startRecording, stopRecording, downloadRecording } =
-    useAudioDownload();
-
-  const sendClientEvent = (eventObj: any, eventNameSuffix = "") => {
-    try {
-      sendEvent(eventObj);
-      logClientEvent(eventObj, eventNameSuffix);
-    } catch (err) {
-      console.error('Failed to send via SDK', err);
-    }
-  };
-
-  useHandleSessionHistory();
-
-  useEffect(() => {
-    let finalAgentConfig = searchParams.get("agentConfig");
-    if (!finalAgentConfig || !allAgentSets[finalAgentConfig]) {
-      finalAgentConfig = defaultAgentSetKey;
-      const url = new URL(window.location.toString());
-      url.searchParams.set("agentConfig", finalAgentConfig);
-      window.location.replace(url.toString());
-      return;
-    }
-
-    const agents = allAgentSets[finalAgentConfig];
-    const agentKeyToUse = agents[0]?.name || "";
-
-    setSelectedAgentName(agentKeyToUse);
-    setSelectedAgentConfigSet(agents);
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (selectedAgentName && sessionStatus === "DISCONNECTED") {
-      connectToRealtime();
-    }
-  }, [selectedAgentName]);
-
-  useEffect(() => {
-    if (
-      sessionStatus === "CONNECTED" &&
-      selectedAgentConfigSet &&
-      selectedAgentName
-    ) {
-      const currentAgent = selectedAgentConfigSet.find(
-        (a) => a.name === selectedAgentName
-      );
-      addTranscriptBreadcrumb(`Agent: ${selectedAgentName}`, currentAgent);
-      updateSession(!handoffTriggeredRef.current);
-      // Reset flag after handling so subsequent effects behave normally
-      handoffTriggeredRef.current = false;
-    }
-  }, [selectedAgentConfigSet, selectedAgentName, sessionStatus]);
-
-  useEffect(() => {
-    if (sessionStatus === "CONNECTED") {
-      updateSession();
-    }
-  }, [isPTTActive]);
-
-  const fetchEphemeralKey = async (): Promise<string | null> => {
-    logClientEvent({ url: "/session" }, "fetch_session_token_request");
-    const tokenResponse = await fetch("/api/session");
-    const data = await tokenResponse.json();
-    logServerEvent(data, "fetch_session_token_response");
-
-    if (!data.client_secret?.value) {
-      logClientEvent(data, "error.no_ephemeral_key");
-      console.error("No ephemeral key provided by the server");
-      setSessionStatus("DISCONNECTED");
-      return null;
-    }
-
-    return data.client_secret.value;
-  };
-
-  const connectToRealtime = async () => {
-    const agentSetKey = searchParams.get("agentConfig") || "default";
-    if (sdkScenarioMap[agentSetKey]) {
-      if (sessionStatus !== "DISCONNECTED") return;
-      setSessionStatus("CONNECTING");
-
-      try {
-        const EPHEMERAL_KEY = await fetchEphemeralKey();
-        if (!EPHEMERAL_KEY) return;
-
-        // Ensure the selectedAgentName is first so that it becomes the root
-        const reorderedAgents = [...sdkScenarioMap[agentSetKey]];
-        const idx = reorderedAgents.findIndex((a) => a.name === selectedAgentName);
-        if (idx > 0) {
-          const [agent] = reorderedAgents.splice(idx, 1);
-          reorderedAgents.unshift(agent);
-        }
-
-        const companyName = agentSetKey === 'customerServiceRetail'
-          ? customerServiceRetailCompanyName
-          : chatSupervisorCompanyName;
-        const guardrail = createModerationGuardrail(companyName);
-
-        await connect({
-          getEphemeralKey: async () => EPHEMERAL_KEY,
-          initialAgents: reorderedAgents,
-          audioElement: sdkAudioElement,
-          outputGuardrails: [guardrail],
-          extraContext: {
-            addTranscriptBreadcrumb,
-          },
-        });
-      } catch (err) {
-        console.error("Error connecting via SDK:", err);
-        setSessionStatus("DISCONNECTED");
-      }
-      return;
-    }
-  };
-
-  const disconnectFromRealtime = () => {
-    disconnect();
-    setSessionStatus("DISCONNECTED");
-    setIsPTTUserSpeaking(false);
-  };
-
-  const sendSimulatedUserMessage = (text: string) => {
-    const id = uuidv4().slice(0, 32);
-    addTranscriptMessage(id, "user", text, true);
-
-    sendClientEvent({
-      type: 'conversation.item.create',
-      item: {
-        id,
-        type: 'message',
-        role: 'user',
-        content: [{ type: 'input_text', text }],
-      },
-    });
-    sendClientEvent({ type: 'response.create' }, '(simulated user text message)');
-  };
-
-  const updateSession = (shouldTriggerResponse: boolean = false) => {
-    // Reflect Push-to-Talk UI state by (de)activating server VAD on the
-    // backend. The Realtime SDK supports live session updates via the
-    // `session.update` event.
-    const turnDetection = isPTTActive
-      ? null
-      : {
-          type: 'server_vad',
-          threshold: 0.9,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 500,
-          create_response: true,
-        };
-
-    sendEvent({
-      type: 'session.update',
-      session: {
-        turn_detection: turnDetection,
-      },
-    });
-
-    // Send an initial 'hi' message to trigger the agent to greet the user
-    if (shouldTriggerResponse) {
-      sendSimulatedUserMessage('hi');
-    }
-    return;
-  }
-
-  const handleSendTextMessage = () => {
-    if (!userText.trim()) return;
-    interrupt();
-
-    try {
-      sendUserText(userText.trim());
-    } catch (err) {
-      console.error('Failed to send via SDK', err);
-    }
-
-    setUserText("");
-  };
-
-  const handleTalkButtonDown = () => {
-    if (sessionStatus !== 'CONNECTED') return;
-    interrupt();
-
-    setIsPTTUserSpeaking(true);
-    sendClientEvent({ type: 'input_audio_buffer.clear' }, 'clear PTT buffer');
-
-    // No placeholder; we'll rely on server transcript once ready.
-  };
-
-  const handleTalkButtonUp = () => {
-    if (sessionStatus !== 'CONNECTED' || !isPTTUserSpeaking)
-      return;
-
-    setIsPTTUserSpeaking(false);
-    sendClientEvent({ type: 'input_audio_buffer.commit' }, 'commit PTT');
-    sendClientEvent({ type: 'response.create' }, 'trigger response PTT');
-  };
-
-  const onToggleConnection = () => {
-    if (sessionStatus === "CONNECTED" || sessionStatus === "CONNECTING") {
-      disconnectFromRealtime();
-      setSessionStatus("DISCONNECTED");
-    } else {
-      connectToRealtime();
-    }
-  };
-
-  const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newAgentConfig = e.target.value;
-    const url = new URL(window.location.toString());
-    url.searchParams.set("agentConfig", newAgentConfig);
-    window.location.replace(url.toString());
-  };
-
-  const handleSelectedAgentChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const newAgentName = e.target.value;
-    // Reconnect session with the newly selected agent as root so that tool
-    // execution works correctly.
-    disconnectFromRealtime();
-    setSelectedAgentName(newAgentName);
-    // connectToRealtime will be triggered by effect watching selectedAgentName
-  };
-
-  // Because we need a new connection, refresh the page when codec changes
-  const handleCodecChange = (newCodec: string) => {
-    const url = new URL(window.location.toString());
-    url.searchParams.set("codec", newCodec);
-    window.location.replace(url.toString());
-  };
-
-  useEffect(() => {
-    const storedPushToTalkUI = localStorage.getItem("pushToTalkUI");
-    if (storedPushToTalkUI) {
-      setIsPTTActive(storedPushToTalkUI === "true");
-    }
-    const storedLogsExpanded = localStorage.getItem("logsExpanded");
-    if (storedLogsExpanded) {
-      setIsEventsPaneExpanded(storedLogsExpanded === "true");
-    }
-    const storedAudioPlaybackEnabled = localStorage.getItem(
-      "audioPlaybackEnabled"
-    );
-    if (storedAudioPlaybackEnabled) {
-      setIsAudioPlaybackEnabled(storedAudioPlaybackEnabled === "true");
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("pushToTalkUI", isPTTActive.toString());
-  }, [isPTTActive]);
-
-  useEffect(() => {
-    localStorage.setItem("logsExpanded", isEventsPaneExpanded.toString());
-  }, [isEventsPaneExpanded]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "audioPlaybackEnabled",
-      isAudioPlaybackEnabled.toString()
-    );
-  }, [isAudioPlaybackEnabled]);
-
-  useEffect(() => {
-    if (audioElementRef.current) {
-      if (isAudioPlaybackEnabled) {
-        audioElementRef.current.muted = false;
-        audioElementRef.current.play().catch((err) => {
-          console.warn("Autoplay may be blocked by browser:", err);
-        });
-      } else {
-        // Mute and pause to avoid brief audio blips before pause takes effect.
-        audioElementRef.current.muted = true;
-        audioElementRef.current.pause();
-      }
-    }
-
-    // Toggle server-side audio stream mute so bandwidth is saved when the
-    // user disables playback. 
-    try {
-      mute(!isAudioPlaybackEnabled);
-    } catch (err) {
-      console.warn('Failed to toggle SDK mute', err);
-    }
-  }, [isAudioPlaybackEnabled]);
-
-  // Ensure mute state is propagated to transport right after we connect or
-  // whenever the SDK client reference becomes available.
-  useEffect(() => {
-    if (sessionStatus === 'CONNECTED') {
-      try {
-        mute(!isAudioPlaybackEnabled);
-      } catch (err) {
-        console.warn('mute sync after connect failed', err);
-      }
-    }
-  }, [sessionStatus, isAudioPlaybackEnabled]);
-
-  useEffect(() => {
-    if (sessionStatus === "CONNECTED" && audioElementRef.current?.srcObject) {
-      // The remote audio stream from the audio element.
-      const remoteStream = audioElementRef.current.srcObject as MediaStream;
-      startRecording(remoteStream);
-    }
-
-    // Clean up on unmount or when sessionStatus is updated.
-    return () => {
-      stopRecording();
-    };
-  }, [sessionStatus]);
-
-  const agentSetKey = searchParams.get("agentConfig") || "default";
-
+const AnalysisCard: React.FC<{ response: MedicalAnalysisResponse }> = ({
+  response,
+}) => {
   return (
-    <div className="text-base flex flex-col h-screen bg-gray-100 text-gray-800 relative">
-      <div className="p-5 text-lg font-semibold flex justify-between items-center">
-        <div
-          className="flex items-center cursor-pointer"
-          onClick={() => window.location.reload()}
-        >
-          <div>
-            <Image
-              src="/openai-logomark.svg"
-              alt="OpenAI Logo"
-              width={20}
-              height={20}
-              className="mr-2"
-            />
-          </div>
-          <div>
-            Realtime API <span className="text-gray-500">Agents</span>
+    <div
+      className={`${glass} rounded-2xl p-6 grid gap-4 animate-fade-in`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Sparkles className="text-teal-600" />
+          <h3 className="text-xl font-semibold text-slate-900">Clinical Brain</h3>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-600">Urgency</span>
+          <div
+            className={`h-3 w-24 rounded-full bg-gradient-to-r ${urgencyGradient[Math.min(response.urgencyLevel - 1, 4)]}`}
+          />
+          <span className="text-sm font-semibold text-slate-900">
+            {response.urgencyLevel}/5
+          </span>
+        </div>
+      </div>
+      <p className="text-slate-700 leading-relaxed">{response.clinicalSummary}</p>
+      {response.interviewQuestions && response.interviewQuestions.length > 0 && (
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-3 text-amber-800">
+          <p className="font-semibold">Interview Mode</p>
+          <ul className="list-disc ml-5 text-sm mt-1">
+            {response.interviewQuestions.map((q) => (
+              <li key={q}>{q}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+          <h4 className="font-semibold flex items-center gap-2 text-slate-900">
+            <Stethoscope className="text-teal-600" size={18} /> Differential Diagnosis
+          </h4>
+          <ul className="mt-2 space-y-1 text-sm text-slate-700">
+            {response.differentialDiagnosis.map((d) => (
+              <li key={d.hypothesis} className="flex justify-between">
+                <span>{d.hypothesis}</span>
+                <span className="font-semibold">{Math.round(d.probability * 100)}%</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+          <h4 className="font-semibold flex items-center gap-2 text-slate-900">
+            <AlertTriangle className="text-orange-500" size={18} /> Red Flags
+          </h4>
+          <ul className="mt-2 space-y-1 text-sm text-slate-700 list-disc ml-4">
+            {response.redFlags.map((flag) => (
+              <li key={flag}>{flag}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+          <h4 className="font-semibold text-slate-900">Action Plan</h4>
+          <ol className="list-decimal ml-4 mt-2 space-y-1 text-sm text-slate-700">
+            {response.actionPlan.map((plan) => (
+              <li key={plan}>{plan}</li>
+            ))}
+          </ol>
+        </div>
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+          <h4 className="font-semibold text-slate-900">Medications & Interactions</h4>
+          <div className="mt-2 space-y-2 text-sm text-slate-700">
+            {response.prePrescription.map((p) => (
+              <div key={p.name} className="border border-slate-100 rounded-lg p-2 bg-white">
+                <p className="font-semibold text-slate-900">{p.name}</p>
+                <p className="text-xs">{p.dosage}</p>
+                <p className="text-xs text-slate-600">{p.usage}</p>
+                <p className="text-xs text-red-600">{p.warnings}</p>
+              </div>
+            ))}
+            {response.drugInteractions.length > 0 && (
+              <div className="rounded-lg bg-red-50 border border-red-200 p-2 text-red-700">
+                <p className="font-semibold">Interactions</p>
+                <ul className="list-disc ml-4 text-xs">
+                  {response.drugInteractions.map((i) => (
+                    <li key={i.interaction}>
+                      {i.drugs.join(" + ")} → {i.interaction}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </div>
-        <div className="flex items-center">
-          <label className="flex items-center text-base gap-1 mr-2 font-medium">
-            Scenario
-          </label>
-          <div className="relative inline-block">
-            <select
-              value={agentSetKey}
-              onChange={handleAgentChange}
-              className="appearance-none border border-gray-300 rounded-lg text-base px-2 py-1 pr-8 cursor-pointer font-normal focus:outline-none"
+      </div>
+      {response.geolocatedHospitals.length > 0 && (
+        <div className="rounded-xl bg-slate-50 p-4 border border-slate-100">
+          <h4 className="font-semibold flex items-center gap-2 text-slate-900">
+            <MapPin className="text-teal-600" size={18} /> Nearby Hospitals
+          </h4>
+          <div className="mt-2 grid sm:grid-cols-2 gap-2">
+            {response.geolocatedHospitals.map((hosp) => (
+              <div key={hosp.name} className="p-2 border border-slate-100 rounded-lg bg-white text-sm">
+                <p className="font-semibold text-slate-900">{hosp.name}</p>
+                <p className="text-slate-600 text-xs">{hosp.address}</p>
+                <p className="text-xs">ETA: {hosp.distanceMinutes ?? "-"} mins</p>
+                {hosp.mapUrl && (
+                  <a
+                    href={hosp.mapUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-teal-600 text-xs underline"
+                  >
+                    Open map
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const LiveConsultation: React.FC<{
+  active: boolean;
+  onToggle: () => void;
+}> = ({ active, onToggle }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [status, setStatus] = useState<string>("Idle");
+  const [transcript, setTranscript] = useState<string>("");
+  const sessionRef = useRef<any>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+
+  useEffect(() => {
+    if (!active) return;
+    const startMedia = async () => {
+      const media = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: { facingMode: "user" },
+      });
+      setStream(media);
+      if (videoRef.current) {
+        videoRef.current.srcObject = media;
+        videoRef.current.play();
+      }
+    };
+    startMedia();
+    return () => {
+      stream?.getTracks().forEach((t) => t.stop());
+    };
+  }, [active]);
+
+  const beginLive = async () => {
+    setStatus("Connecting to Gemini...");
+    sessionRef.current = await geminiService.startLiveConsultation({
+      onMessage: (message) => {
+        setStatus("Streaming");
+        const text = message?.response?.text ?? message?.response?.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join(" ");
+        if (text) setTranscript((prev) => `${prev}\n${text}`);
+      },
+      onError: () => setStatus("Error"),
+      onClose: () => setStatus("Disconnected"),
+    });
+  };
+
+  useEffect(() => {
+    if (!active || !stream) return;
+    beginLive();
+    const recorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+    recorder.ondataavailable = async (event) => {
+      if (!sessionRef.current || !event.data.size) return;
+      const buffer = await event.data.arrayBuffer();
+      sessionRef.current.sendAudioFrame(new Uint8Array(buffer));
+    };
+    recorder.start(500);
+    return () => {
+      recorder.stop();
+      sessionRef.current?.close();
+      setStatus("Idle");
+    };
+  }, [active, stream]);
+
+  return (
+    <div className={`${glass} rounded-2xl p-4 flex flex-col gap-3`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Video className="text-teal-600" />
+          <p className="font-semibold">Live Consultation</p>
+        </div>
+        <button
+          onClick={onToggle}
+          className="px-3 py-1 rounded-full text-sm bg-teal-600 text-white hover:bg-teal-700"
+        >
+          {active ? "Stop" : "Start"}
+        </button>
+      </div>
+      <div className="relative w-full overflow-hidden rounded-xl bg-slate-900">
+        <video ref={videoRef} className="w-full object-cover opacity-90" muted playsInline />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+        <div className="absolute bottom-3 left-3 flex items-center gap-2">
+          <div className={`h-3 w-3 rounded-full animate-pulse ${active ? "bg-teal-400" : "bg-slate-400"}`} />
+          <span className="text-white text-sm">{status}</span>
+        </div>
+      </div>
+      <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 h-28 overflow-y-auto text-sm text-slate-700">
+        {transcript || "Awaiting audio..."}
+      </div>
+      <div className="flex gap-3 text-xs text-slate-600">
+        <div className="flex items-center gap-1"><Mic size={14} className="text-teal-600" /> Streaming audio</div>
+        <div className="flex items-center gap-1"><Camera size={14} className="text-teal-600" /> Selfie video mirrored</div>
+        <div className="flex items-center gap-1"><Volume2 size={14} className="text-teal-600" /> Real-time responses</div>
+      </div>
+    </div>
+  );
+};
+
+const OfflineAid: React.FC<{ guides: OfflineGuide[] }> = ({ guides }) => (
+  <div className={`${glass} rounded-2xl p-4`}>
+    <div className="flex items-center gap-2 mb-2">
+      <AlertTriangle className="text-orange-500" />
+      <p className="font-semibold text-slate-900">Offline First Aid</p>
+    </div>
+    <div className="grid sm:grid-cols-2 gap-3">
+      {guides.map((guide) => (
+        <div key={guide.code} className="rounded-xl border border-slate-100 bg-gradient-to-br from-white to-slate-50 p-3">
+          <p className="font-semibold text-slate-900">{guide.title}</p>
+          <ol className="list-decimal ml-4 mt-2 space-y-1 text-sm text-slate-700">
+            {guide.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+export default function App() {
+  const [language, setLanguage] = useState<Language>("en");
+  const [userInput, setUserInput] = useState<string>("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [bodyMetrics, setBodyMetrics] = useState<BodyMetrics>({
+    weightKg: 70,
+    heightCm: 175,
+    age: 30,
+    activityLevel: "moderate",
+  });
+  const [history, setHistory] = useState<InteractionRecord[]>([]);
+  const [activeLive, setActiveLive] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [emergency, setEmergency] = useState(false);
+
+  const latestResponse = useMemo(() => history[0]?.response, [history]);
+
+  const attachFiles = async () => {
+    const media = await Promise.all(
+      selectedFiles.map(async (file) => ({
+        data: await toBase64(file),
+        mimeType: file.type,
+      })),
+    );
+    return media;
+  };
+
+  const addInteraction = (record: InteractionRecord) => {
+    setHistory((prev) => [record, ...prev].slice(0, 20));
+  };
+
+  const runAnalysis = async (category: InteractionRecord["category"], opts: {
+    text?: string;
+    files?: { data: string; mimeType: string }[];
+    body?: BodyMetrics;
+  }) => {
+    setLoading(true);
+    try {
+      const response = await geminiService.analyzeClinicalData({
+        text: opts.text ?? "",
+        files: opts.files,
+        locale: language,
+        bodyMetrics: opts.body,
+      });
+      addInteraction({
+        id: uuidv4(),
+        createdAt: Date.now(),
+        userText: opts.text,
+        attachments:
+          selectedFiles.map((f) => ({ name: f.name, type: f.type })) ?? [],
+        response,
+        category,
+      });
+      if (response.urgencyLevel >= 5) setEmergency(true);
+      setAudioUrl(null);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const files = await attachFiles();
+    await runAnalysis("clinical", { text: userInput, files });
+    setUserInput("");
+    setSelectedFiles([]);
+  };
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setSelectedFiles(Array.from(e.target.files));
+  };
+
+  const handleMedicationScan = async () => {
+    const image = selectedFiles.find((f) => f.type.startsWith("image"));
+    if (!image) return;
+    const base64 = await toBase64(image);
+    await runAnalysis("medication", {
+      text: "Medication scanner request",
+      files: [{ data: base64, mimeType: image.type }],
+    });
+  };
+
+  const handleVoice = async () => {
+    const audio = selectedFiles.find((f) => f.type.startsWith("audio"));
+    if (!audio) return;
+    const base64 = await toBase64(audio);
+    await runAnalysis("voice", {
+      text: "Voice biomarker analysis",
+      files: [{ data: base64, mimeType: audio.type }],
+    });
+  };
+
+  const handleVision = async () => {
+    const image = selectedFiles.find((f) => f.type.startsWith("image"));
+    if (!image) return;
+    const base64 = await toBase64(image);
+    await runAnalysis("vision", {
+      text: "Vision analysis for lesions",
+      files: [{ data: base64, mimeType: image.type }],
+    });
+  };
+
+  const handleBody = async () => {
+    const photo = selectedFiles.find((f) => f.type.startsWith("image"));
+    const payload = { ...bodyMetrics };
+    if (photo) payload.photoDataUrl = await toBase64(photo);
+    await runAnalysis("body", { text: "Body metrics analysis", body: payload });
+  };
+
+  const exportPdf = () => {
+    if (!latestResponse) return;
+    geminiService.generatePdfReport(latestResponse);
+  };
+
+  const playAudio = async () => {
+    if (!latestResponse) return;
+    const blob = await geminiService.generateAudioSummary(
+      latestResponse.clinicalSummary,
+    );
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    setAudioUrl(url);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (audioUrl) URL.revokeObjectURL(audioUrl);
+    };
+  }, [audioUrl]);
+
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-900">
+      {emergency && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-900/40">
+          <div className="bg-white rounded-3xl p-8 shadow-2xl border-4 border-red-500 animate-pulse">
+            <div className="flex items-center gap-3 mb-3">
+              <AlertTriangle className="text-red-600" size={32} />
+              <h2 className="text-2xl font-bold text-red-700">Critical Urgency Detected</h2>
+            </div>
+            <p className="text-red-700 mb-4">Call emergency services immediately.</p>
+            <a
+              href="tel:112"
+              className="bg-red-600 text-white px-4 py-2 rounded-xl text-lg font-semibold flex items-center gap-2"
             >
-              {Object.keys(allAgentSets).map((agentKey) => (
-                <option key={agentKey} value={agentKey}>
-                  {agentKey}
+              <PhoneCall /> Call Emergency
+            </a>
+            <button
+              onClick={() => setEmergency(false)}
+              className="mt-4 text-sm text-slate-600 underline"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-6xl mx-auto px-4 py-10 space-y-6">
+        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm uppercase tracking-wide text-teal-600">Next-Gen Multimodal AI</p>
+            <h1 className="text-4xl font-bold text-slate-900">Vitalia Medical Assistant</h1>
+            <p className="text-slate-600">Smart intake, triage, and live consultation powered by Gemini 2.5 Flash.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Languages className="text-teal-600" />
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as Language)}
+              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"
+            >
+              {languages.map((lang) => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.label}
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-600">
-              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M5.23 7.21a.75.75 0 011.06.02L10 10.44l3.71-3.21a.75.75 0 111.04 1.08l-4.25 3.65a.75.75 0 01-1.04 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                  clipRule="evenodd"
-                />
-              </svg>
+          </div>
+        </header>
+
+        <section className="grid lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
+            <div className={`${glass} rounded-3xl p-4`}>
+              <div className="flex items-center gap-3 mb-3">
+                <Brain className="text-teal-600" />
+                <div>
+                  <p className="font-semibold">Smart Intake</p>
+                  <p className="text-sm text-slate-600">Text, images, audio, or PDF. Vitalia will triage automatically.</p>
+                </div>
+              </div>
+              <textarea
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                placeholder="Describe symptoms, upload labs, or ask a question..."
+                className="w-full rounded-2xl border border-slate-200 p-4 bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"
+                rows={4}
+              />
+              <div className="flex flex-wrap gap-2 items-center mt-3">
+                <label className="flex items-center gap-2 text-sm px-3 py-2 rounded-full border border-slate-200 bg-white cursor-pointer hover:border-teal-500">
+                  <FileImage size={16} />
+                  Image/PDF/Audio
+                  <input type="file" className="hidden" multiple accept="image/*,application/pdf,audio/*" onChange={handleFileInput} />
+                </label>
+                {selectedFiles.map((file) => (
+                  <span key={file.name} className="px-3 py-1 text-xs rounded-full bg-slate-100 border border-slate-200">
+                    {file.name}
+                  </span>
+                ))}
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="ml-auto bg-teal-600 text-white px-4 py-2 rounded-full hover:bg-teal-700 disabled:opacity-60"
+                >
+                  {loading ? "Analyzing..." : "Send to Brain"}
+                </button>
+              </div>
             </div>
+
+            {latestResponse && (
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={exportPdf}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-sm"
+                >
+                  <Download size={16} /> Export PDF
+                </button>
+                <button
+                  onClick={playAudio}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-sm"
+                >
+                  <Play size={16} /> Audio Report
+                </button>
+                {audioUrl && (
+                  <audio src={audioUrl} autoPlay controls className="mt-2" />
+                )}
+              </div>
+            )}
+
+            <LiveConsultation
+              active={activeLive}
+              onToggle={() => setActiveLive((prev) => !prev)}
+            />
           </div>
 
-          {agentSetKey && (
-            <div className="flex items-center ml-6">
-              <label className="flex items-center text-base gap-1 mr-2 font-medium">
-                Agent
-              </label>
-              <div className="relative inline-block">
-                <select
-                  value={selectedAgentName}
-                  onChange={handleSelectedAgentChange}
-                  className="appearance-none border border-gray-300 rounded-lg text-base px-2 py-1 pr-8 cursor-pointer font-normal focus:outline-none"
-                >
-                  {selectedAgentConfigSet?.map((agent) => (
-                    <option key={agent.name} value={agent.name}>
-                      {agent.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-600">
-                  <svg
-                    className="h-4 w-4"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.23 7.21a.75.75 0 011.06.02L10 10.44l3.71-3.21a.75.75 0 111.04 1.08l-4.25 3.65a.75.75 0 01-1.04 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                      clipRule="evenodd"
+          <div className="space-y-4">
+            <div className={`${glass} rounded-2xl p-4 sticky top-6 space-y-3`}>
+              <div className="flex items-center gap-2">
+                <ActivitySquare className="text-teal-600" />
+                <p className="font-semibold">Tools Menu</p>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={handleMedicationScan} className="rounded-xl border border-slate-200 bg-white p-3 text-sm hover:border-teal-500 flex flex-col items-start gap-1">
+                  <FileImage className="text-teal-600" size={18} /> Medication Scanner
+                </button>
+                <button onClick={handleVoice} className="rounded-xl border border-slate-200 bg-white p-3 text-sm hover:border-teal-500 flex flex-col items-start gap-1">
+                  <FileAudio className="text-teal-600" size={18} /> Voice Analysis
+                </button>
+                <button onClick={handleVision} className="rounded-xl border border-slate-200 bg-white p-3 text-sm hover:border-teal-500 flex flex-col items-start gap-1">
+                  <Camera className="text-teal-600" size={18} /> Vision Check
+                </button>
+                <button onClick={handleBody} className="rounded-xl border border-slate-200 bg-white p-3 text-sm hover:border-teal-500 flex flex-col items-start gap-1">
+                  <ActivitySquare className="text-teal-600" size={18} /> Body & Nutrition
+                </button>
+              </div>
+              <div className="rounded-xl bg-slate-50 border border-slate-100 p-3 text-sm space-y-2">
+                <p className="font-semibold">Body Metrics</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <label className="flex flex-col gap-1">
+                    <span className="text-slate-600">Weight (kg)</span>
+                    <input
+                      type="number"
+                      value={bodyMetrics.weightKg}
+                      onChange={(e) => setBodyMetrics({ ...bodyMetrics, weightKg: Number(e.target.value) })}
+                      className="rounded-lg border border-slate-200 px-2 py-1"
                     />
-                  </svg>
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-slate-600">Height (cm)</span>
+                    <input
+                      type="number"
+                      value={bodyMetrics.heightCm}
+                      onChange={(e) => setBodyMetrics({ ...bodyMetrics, heightCm: Number(e.target.value) })}
+                      className="rounded-lg border border-slate-200 px-2 py-1"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-slate-600">Age</span>
+                    <input
+                      type="number"
+                      value={bodyMetrics.age}
+                      onChange={(e) => setBodyMetrics({ ...bodyMetrics, age: Number(e.target.value) })}
+                      className="rounded-lg border border-slate-200 px-2 py-1"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-1">
+                    <span className="text-slate-600">Activity</span>
+                    <select
+                      value={bodyMetrics.activityLevel}
+                      onChange={(e) => setBodyMetrics({ ...bodyMetrics, activityLevel: e.target.value })}
+                      className="rounded-lg border border-slate-200 px-2 py-1"
+                    >
+                      <option value="sedentary">Sedentary</option>
+                      <option value="light">Light</option>
+                      <option value="moderate">Moderate</option>
+                      <option value="athlete">Athlete</option>
+                    </select>
+                  </label>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        </section>
+
+        <section className="grid lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2 space-y-4">
+            {latestResponse ? (
+              <AnalysisCard response={latestResponse} />
+            ) : (
+              <div className={`${glass} rounded-2xl p-6 text-slate-600`}>Awaiting your intake to start analysis.</div>
+            )}
+
+            <div className={`${glass} rounded-2xl p-4`}>
+              <div className="flex items-center gap-2 mb-3">
+                <FileText className="text-teal-600" />
+                <p className="font-semibold">Dashboard Feed</p>
+              </div>
+              <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                {history.map((item) => (
+                  <div key={item.id} className="p-3 rounded-xl border border-slate-200 bg-white/80">
+                    <div className="flex justify-between text-xs text-slate-600">
+                      <span>{new Date(item.createdAt).toLocaleTimeString()}</span>
+                      <span className="uppercase tracking-wide text-teal-600 font-semibold">{item.category}</span>
+                    </div>
+                    <p className="text-sm text-slate-800 mt-1">{item.userText || "Signal"}</p>
+                    {item.response && (
+                      <p className="text-xs text-slate-600 mt-1">Urgency: {item.response.urgencyLevel} | {item.response.differentialDiagnosis[0]?.hypothesis}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <OfflineAid guides={OFFLINE_GUIDES} />
+          </div>
+        </section>
       </div>
-
-      <div className="flex flex-1 gap-2 px-2 overflow-hidden relative">
-        <Transcript
-          userText={userText}
-          setUserText={setUserText}
-          onSendMessage={handleSendTextMessage}
-          downloadRecording={downloadRecording}
-          canSend={
-            sessionStatus === "CONNECTED"
-          }
-        />
-
-        <Events isExpanded={isEventsPaneExpanded} />
-      </div>
-
-      <BottomToolbar
-        sessionStatus={sessionStatus}
-        onToggleConnection={onToggleConnection}
-        isPTTActive={isPTTActive}
-        setIsPTTActive={setIsPTTActive}
-        isPTTUserSpeaking={isPTTUserSpeaking}
-        handleTalkButtonDown={handleTalkButtonDown}
-        handleTalkButtonUp={handleTalkButtonUp}
-        isEventsPaneExpanded={isEventsPaneExpanded}
-        setIsEventsPaneExpanded={setIsEventsPaneExpanded}
-        isAudioPlaybackEnabled={isAudioPlaybackEnabled}
-        setIsAudioPlaybackEnabled={setIsAudioPlaybackEnabled}
-        codec={urlCodec}
-        onCodecChange={handleCodecChange}
-      />
-    </div>
+    </main>
   );
 }
-
-export default App;
