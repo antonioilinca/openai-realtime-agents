@@ -88,10 +88,11 @@ Speak at a medium pace—steady and clear. Brief pauses can be used for emphasis
         required: ['phoneNumber'],
         additionalProperties: false,
       },
-      execute: async (input: any) => {
-        const { phoneNumber } = input as { phoneNumber: string };
-        return {
-          orders: [
+        execute: async (input: any) => {
+          const { phoneNumber } = input as { phoneNumber: string };
+          return {
+            customer_phone: phoneNumber,
+            orders: [
             {
               order_id: 'SNP-20230914-001',
               order_date: '2024-09-14T09:30:00Z',
@@ -160,12 +161,18 @@ Speak at a medium pace—steady and clear. Brief pauses can be used for emphasis
         required: ['region', 'itemCategory'],
         additionalProperties: false,
       },
-      execute: async (input: any) => {
-        return {
-          policy: `
-At Snowy Peak Boards, we believe in transparent and customer-friendly policies to ensure you have a hassle-free experience. Below are our detailed guidelines:
+        execute: async (input: any) => {
+          const { region, itemCategory } = input as {
+            region: string;
+            itemCategory: string;
+          };
+          return {
+            region,
+            itemCategory,
+            policy: `
+  At Snowy Peak Boards, we believe in transparent and customer-friendly policies to ensure you have a hassle-free experience. Below are our detailed guidelines:
 
-1. GENERAL RETURN POLICY
+  1. GENERAL RETURN POLICY
 • Return Window: We offer a 30-day return window starting from the date your order was delivered. 
 • Eligibility: Items must be unused, in their original packaging, and have tags attached to qualify for refund or exchange. 
 • Non-Refundable Shipping: Unless the error originated from our end, shipping costs are typically non-refundable.
