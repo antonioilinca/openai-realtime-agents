@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MIND OPERATIVE : BLACKCELL PROTOCOL</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div id="scanline"></div>
+  <div class="frame">
+    <header>
+      <div class="logo">███ BLACKCELL PROTOCOL ███</div>
+      <div class="oracle">
+        <span class="label">ORACLE-9</span>
+        <span id="oracle-status">analyzing cognitive parameters...</span>
+      </div>
+    </header>
+    <main>
+      <section class="left">
+        <div class="panel" id="menu-panel">
+          <h2>MAIN MENU</h2>
+          <div class="menu">
+            <button class="btn" data-action="start">Start Mission</button>
+            <button class="btn" data-action="training">Training Room</button>
+            <button class="btn" data-action="archives">Blackcell Archives</button>
+            <button class="btn" data-action="settings">System Settings</button>
+            <button class="btn" data-action="exit">Exit Protocol</button>
+          </div>
+        </div>
+
+        <div class="panel" id="profile-panel">
+          <h2>OPERATIVE PROFILE</h2>
+          <div class="stats-grid" id="stats-grid"></div>
+          <div class="history">
+            <h3>Recent Debriefs</h3>
+            <ul id="debrief-log"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="right">
+        <div class="panel mission" id="mission-panel">
+          <div class="mission-header">
+            <div>
+              <h2 id="mission-title">Awaiting Selection</h2>
+              <p id="mission-sub">Oracle is preparing your simulation.</p>
+            </div>
+            <div class="badge" id="mission-badge">standby</div>
+          </div>
+          <div id="mission-body"></div>
+          <div class="mission-footer">
+            <div>
+              <span class="tag">Difficulty</span>
+              <span id="mission-difficulty">dynamic</span>
+            </div>
+            <div>
+              <span class="tag">Timer</span>
+              <span id="mission-timer">--</span>
+            </div>
+            <div>
+              <span class="tag">ORACLE-9</span>
+              <span id="mission-oracle">"Awaiting directive."</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="overlay" id="glitch-overlay"></div>
+
+  <template id="decision-template">
+    <div class="scenario">
+      <p class="scenario-text"></p>
+      <div class="options"></div>
+    </div>
+  </template>
+
+  <template id="sequence-template">
+    <div class="sequence">
+      <div class="sequence-grid"></div>
+      <button class="btn hollow" data-role="replay">Replay Sequence</button>
+      <input class="input" data-role="answer" placeholder="Enter sequence" />
+      <button class="btn" data-role="submit">Submit</button>
+    </div>
+  </template>
+
+  <template id="micro-template">
+    <div class="micro-test">
+      <div class="flash"></div>
+      <p class="micro-instructions">Observe the flash. Identify the glyph.</p>
+      <div class="micro-options"></div>
+    </div>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
