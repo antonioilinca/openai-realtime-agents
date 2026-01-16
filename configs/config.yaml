@@ -1,0 +1,36 @@
+app:
+  environment: dev
+  user_agent: "AIONBot/1.0 (+https://example.org/aion)"
+  rate_limit_per_host: 1
+  request_timeout_seconds: 20
+  max_retries: 3
+  backoff_seconds: 2
+  daily_brief_hour: 7
+  ingestion_interval_minutes: 30
+  health_check_interval_minutes: 15
+storage:
+  root_path: storage
+  raw_path: storage/raw
+  cache_path: storage/cache
+  reports_path: storage/reports
+  vector_path: storage/vectors
+  sqlite_path: storage/metadata/aion.db
+index:
+  embedding_dim: 256
+  similarity_threshold: 0.92
+  max_near_duplicates: 5
+source_quality:
+  base_scores:
+    default: 0.5
+    gov: 0.8
+    edu: 0.75
+    news: 0.6
+  domain_overrides:
+    arxiv.org: 0.7
+    bbc.co.uk: 0.7
+    nasa.gov: 0.85
+evaluation:
+  novelty_threshold: 0.2
+  hallucination_keyword_blacklist:
+    - "rumor"
+    - "unconfirmed"

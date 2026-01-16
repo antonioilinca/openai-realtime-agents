@@ -1,0 +1,26 @@
+sources:
+  - id: openai-blog
+    type: rss
+    name: OpenAI Blog
+    url: https://openai.com/blog/rss/
+    topics: [ai, research]
+  - id: nasa-news
+    type: rss
+    name: NASA News
+    url: https://www.nasa.gov/news-release/feed/
+    topics: [science, space]
+  - id: arxiv-cs-ai
+    type: rss
+    name: arXiv AI
+    url: https://export.arxiv.org/rss/cs.AI
+    topics: [ai, research]
+  - id: world-bank
+    type: rss
+    name: World Bank
+    url: https://www.worldbank.org/en/news/all/rss
+    topics: [economy, policy]
+  - id: who-news
+    type: rss
+    name: WHO News
+    url: https://www.who.int/feeds/entity/mediacentre/news/en/rss.xml
+    topics: [health, policy]
