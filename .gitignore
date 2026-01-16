@@ -40,3 +40,15 @@ yarn-error.log*
 next-env.d.ts
 todo.md
 
+# python
+.venv
+__pycache__/
+*.pyc
+.pytest_cache/
+storage/metadata/*.db
+storage/cache/*.json
+storage/raw/*.txt
+storage/reports/*.json
+storage/reports/*.md
+storage/vectors/*.index
+storage/vectors/*.ids
